@@ -1,5 +1,98 @@
 ---
 description:
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
+
+1. General Principles
+
+    - Encoding: All source files must be UTF-8 encoded.
+    - Indentation: Use 4 spaces for indentation. Tabs are not allowed.
+    - Line Length: Keep lines under 120 characters.
+    - Style: Adhere to the Google Java Style Guide. Keep imports organized.
+    - Philosophy: Prioritize code readability and team collaboration over premature optimization.
+    - Lombok Usage:
+        - Use @RequiredArgsConstructor for constructor dependency injection.
+        - Use @Getter, @Builder, and @NoArgsConstructor for Data Transfer Objects (DTOs).
+        - Strictly forbid `@Setter` on domain entities. State must be mutated through explicit, well-named business
+          methods.
+        - Employ @Slf4j for logging, using placeholder syntax (e.g., log.info("Processing user ID: {}", userId);).
+
+2. Layered (MVC) Architecture
+
+-   Core Packages: The architecture is organized into the following primary packages: config, controller, service,
+    repository, domain, and dto.
+-   The Dependency Rule: Dependencies must flow in one direction: controller → service → repository.
+    -   controller: Handles web requests and responses.
+    -   service: Contains business logic.
+    -   repository: Handles data persistence.
+    -   domain & dto: Used across layers for data representation, but they do not depend on outer layers.
+
+2.1. Layers
+
+-   `domain`: The heart of the application's data model. Contains business entities (e.g., JPA @Entity) and Value
+    Objects.
+-   `dto` (Data Transfer Object): A separate package for objects that carry data between layers, especially between the
+    controller-service and service-view. This prevents exposing domain entities directly to the web layer.
+-   `repository`: Implements data access logic. Typically consists of interfaces extending Spring Data JPA's
+    JpaRepository.
+-   `service`: Orchestrates business logic. It calls repositories to fetch/persist data and performs computations. All
+    business-related transactions should be handled in this layer.
+-   `controller`: The entry point for all HTTP requests. Its sole responsibility is to receive requests, delegate them
+    to the appropriate service, and return a response (either a view name with a model or a JSON object). It should not
+    contain any business logic.
+-   `config`: Contains configuration classes for the application, such as SecurityConfig, WebConfig, etc.
+
+3. Implementation Guide
+
+3.1. Domain Layer (domain)
+
+-   Contents: Core business models, primarily annotated with @Entity.
+-   Behavior: Entities should encapsulate their own state and basic logic (e.g., validation, state transitions).
+-   Annotations: Use @Getter, @Builder, and @NoArgsConstructor(access = AccessLevel.PROTECTED). Avoid @Setter to ensure
+    data integrity. State changes must be made through explicit methods (e.g., updateInfo(...)).
+
+3.2. DTO Package (dto)
+
+-   Purpose: To decouple the service layer from the web layer. Controllers should receive and return DTOs.
+-   Naming: Suffix with Request for request objects and Response for response objects (e.g., UserCreationRequest,
+    UserResponse).
+-   Annotations: Use @Getter, @Builder, @NoArgsConstructor. @Setter is permissible if needed for data binding.
+
+3.3. Repository Layer (repository)
+
+-   Purpose: Defines data persistence operations.
+-   Implementation: Create interfaces that extend JpaRepository<EntityType, IDType>.
+-   Custom Queries: For complex queries, use the @Query annotation or QueryDSL.
+
+3.4. Service Layer (service)
+
+-   Purpose: Implements the core business logic.
+-   Naming: Classes should be named with a Service suffix (e.g., UserService).
+-   Annotations: Annotate with @Service. Use @Transactional(readOnly = true) at the class level and override with
+    @Transactional for methods that modify state.
+-   Responsibility: Should operate on domain entities but communicate with the controller layer using DTOs. A mapping
+    mechanism (e.g., manual implementation, MapStruct) is often used to convert between domain objects and DTOs.
+
+3.5. Controller Layer (controller)
+
+-   Purpose: Handles HTTP requests, validation, and delegation to services.
+-   Annotations: Use @RestController for APIs returning JSON, or @Controller for traditional MVC returning views.
+-   Responsibility: Keep it "thin." Business logic is strictly forbidden. Its job is to manage the HTTP session and the
+    request/response cycle.
+-   Return Type: For REST APIs, always return ResponseEntity<T> to have full control over the HTTP response. For MVC,
+    return a String representing the view name.
+
+4. Exception Handling
+
+-   Business Errors: Create custom exceptions that extend RuntimeException for specific business rule violations (e.g.,
+    UserNotFoundException).
+-   Global Handling: Use a @ControllerAdvice class combined with @ExceptionHandler to centralize exception handling.
+    This allows for consistent error responses across the application.
+
+5. Testing
+
+-   Unit Tests: Use JUnit 5 and Mockito to test services and other components in isolation.
+-   Integration Tests: Use @SpringBootTest to test interactions between layers, particularly the controller and service
+    layers.
+-   Web Layer Tests: Use @WebMvcTest to test the controllers in isolation by mocking the service layer.
