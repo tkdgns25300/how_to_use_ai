@@ -18,6 +18,9 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "uuid", nullable = false, length = 255)
+    private String uuid;
+
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
@@ -41,8 +44,9 @@ public class Card {
     private LocalDateTime createdAt;
 
     @Builder
-    public Card(String title, Category category, String tags, String situation, 
+    public Card(String uuid, String title, Category category, String tags, String situation, 
                 String usageExamples, String content) {
+        this.uuid = uuid;
         this.title = title;
         this.category = category;
         this.tags = tags;

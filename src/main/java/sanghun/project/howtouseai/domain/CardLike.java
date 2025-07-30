@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "`like`")
+@Table(name = "card_like")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class CardLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,16 +22,16 @@ public class Like {
     @JoinColumn(name = "card_id")
     private Card card;
 
-    @Column(name = "device_key", nullable = false, length = 255)
-    private String deviceKey;
+    @Column(name = "uuid", nullable = false, length = 255)
+    private String uuid;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Builder
-    public Like(Card card, String deviceKey) {
+    public CardLike(Card card, String uuid) {
         this.card = card;
-        this.deviceKey = deviceKey;
+        this.uuid = uuid;
         this.createdAt = LocalDateTime.now();
     }
 } 

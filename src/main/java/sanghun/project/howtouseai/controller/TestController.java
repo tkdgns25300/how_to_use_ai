@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sanghun.project.howtouseai.repository.CardRepository;
 import sanghun.project.howtouseai.repository.CategoryRepository;
-import sanghun.project.howtouseai.repository.LikeRepository;
+import sanghun.project.howtouseai.repository.CardLikeRepository;
 
 @Slf4j
 @RestController
@@ -15,14 +15,14 @@ public class TestController {
 
     private final CategoryRepository categoryRepository;
     private final CardRepository cardRepository;
-    private final LikeRepository likeRepository;
+    private final CardLikeRepository cardLikeRepository;
 
     @GetMapping("/test")
     public String test() {
         log.info("GCP MySQL 데이터베이스 연결 테스트");
         log.info("Category count: {}", categoryRepository.count());
         log.info("Card count: {}", cardRepository.count());
-        log.info("Like count: {}", likeRepository.count());
+        log.info("CardLike count: {}", cardLikeRepository.count());
         return "GCP MySQL 데이터베이스 연결 성공!";
     }
 } 
