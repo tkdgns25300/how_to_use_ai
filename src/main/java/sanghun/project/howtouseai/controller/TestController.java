@@ -19,10 +19,10 @@ public class TestController {
 
     @GetMapping("/test")
     public String test() {
-        log.info("데이터베이스 연결 테스트");
+        log.info("GCP MySQL 데이터베이스 연결 테스트");
         log.info("Category count: {}", categoryRepository.count());
         log.info("Card count: {}", cardRepository.count());
         log.info("Like count: {}", likeRepository.count());
-        return "데이터베이스 연결 성공!";
+        return "GCP MySQL 데이터베이스 연결 성공!";
     }
 } 
