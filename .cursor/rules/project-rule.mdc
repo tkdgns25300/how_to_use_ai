@@ -20,8 +20,7 @@ alwaysApply: true
 
 2. Layered (MVC) Architecture
 
--   Core Packages: The architecture is organized into the following primary packages: config, controller, service,
-    repository, domain, and dto.
+-   Core Packages: The architecture is organized into the following primary packages: config, controller, service, repository, domain, and dto.
 -   The Dependency Rule: Dependencies must flow in one direction: controller → service → repository.
     -   controller: Handles web requests and responses.
     -   service: Contains business logic.
