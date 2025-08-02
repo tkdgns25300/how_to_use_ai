@@ -33,4 +33,9 @@ public class Category {
         this.iconUrl = iconUrl;
         this.createdAt = LocalDateTime.now();
     }
+
+    public void updateInfo(String name, String iconUrl) {
+        this.name = name;
+        this.iconUrl = iconUrl;
+    }
 } 

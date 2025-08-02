@@ -71,6 +71,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
     
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleCategoryNotFound(
+            CategoryNotFoundException e) {
+        
+        log.warn("카테고리 없음 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("CATEGORY_NOT_FOUND")
+                .errorMessage(e.getMessage())
+                .details("Category not found in database")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("카테고리를 찾을 수 없습니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+    
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleCategoryAlreadyExists(
             CategoryAlreadyExistsException e) {
