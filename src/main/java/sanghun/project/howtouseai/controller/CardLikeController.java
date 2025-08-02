@@ -39,4 +39,27 @@ public class CardLikeController {
             throw e; // GlobalExceptionHandler에서 처리
         }
     }
+
+    @DeleteMapping("/{cardId}/like")
+    public ResponseEntity<ApiResponse<String>> removeLike(
+            @PathVariable Long cardId,
+            @RequestParam("uuid") String uuid) {
+        
+        log.info("좋아요 취소 API 호출: cardId={}, uuid={}", cardId, uuid);
+        
+        try {
+            cardLikeService.removeLike(cardId, uuid);
+            
+            ApiResponse<String> response = ResponseHelper.success(
+                "좋아요 취소 완료",
+                "카드의 좋아요를 성공적으로 취소했습니다."
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("좋아요 취소 중 오류 발생: {}", e.getMessage(), e);
+            throw e; // GlobalExceptionHandler에서 처리
+        }
+    }
 } 

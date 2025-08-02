@@ -197,6 +197,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
     
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleLikeNotFound(
+            LikeNotFoundException e) {
+        
+        log.warn("좋아요 없음 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("LIKE_NOT_FOUND")
+                .errorMessage(e.getMessage())
+                .details("User has not liked this card")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("좋아요를 찾을 수 없습니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalArgumentException(
             IllegalArgumentException e) {
