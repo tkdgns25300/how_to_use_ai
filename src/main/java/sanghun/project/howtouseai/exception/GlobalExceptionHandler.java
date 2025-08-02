@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import sanghun.project.howtouseai.dto.ApiResponse;
 import sanghun.project.howtouseai.dto.ErrorResponse;
 
@@ -18,6 +19,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleException(Exception e) {
+        // favicon.ico 관련 에러는 무시
+        if (e instanceof NoResourceFoundException && 
+            e.getMessage() != null && 
+            e.getMessage().contains("favicon.ico")) {
+            log.debug("favicon.ico 요청 무시: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+        
         log.error("Unexpected error occurred: ", e);
         
         ErrorResponse errorData = ErrorResponse.builder()

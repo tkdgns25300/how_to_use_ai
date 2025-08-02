@@ -12,6 +12,8 @@ import sanghun.project.howtouseai.exception.CategoryAlreadyExistsException;
 import sanghun.project.howtouseai.repository.CategoryRepository;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,6 +23,17 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
+
+    public List<CategoryResponse> getAllCategories() {
+        log.info("모든 카테고리 조회 요청");
+        
+        List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
+        log.info("카테고리 조회 완료: count={}", categories.size());
+        
+        return categories.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) throws IOException {
@@ -49,11 +62,15 @@ public class CategoryService {
         log.info("카테고리 생성 완료: id={}, name={}", savedCategory.getId(), savedCategory.getName());
 
         // 응답 DTO로 변환
+        return convertToResponse(savedCategory);
+    }
+
+    private CategoryResponse convertToResponse(Category category) {
         return CategoryResponse.builder()
-                .id(savedCategory.getId())
-                .name(savedCategory.getName())
-                .iconUrl(savedCategory.getIconUrl())
-                .createdAt(savedCategory.getCreatedAt())
+                .id(category.getId())
+                .name(category.getName())
+                .iconUrl(category.getIconUrl())
+                .createdAt(category.getCreatedAt())
                 .build();
     }
 } 
