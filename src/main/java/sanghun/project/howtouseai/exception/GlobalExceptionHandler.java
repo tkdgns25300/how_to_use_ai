@@ -27,6 +27,14 @@ public class GlobalExceptionHandler {
             return ResponseEntity.notFound().build();
         }
         
+        // 루트 경로 관련 에러는 무시
+        if (e instanceof NoResourceFoundException && 
+            e.getMessage() != null && 
+            e.getMessage().contains("No static resource .")) {
+            log.debug("루트 경로 요청 무시: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+        
         log.error("Unexpected error occurred: ", e);
         
         ErrorResponse errorData = ErrorResponse.builder()
