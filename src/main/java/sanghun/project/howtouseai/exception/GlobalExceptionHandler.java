@@ -176,6 +176,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
     
+    @ExceptionHandler(LikeAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleLikeAlreadyExists(
+            LikeAlreadyExistsException e) {
+        
+        log.warn("좋아요 중복 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("LIKE_ALREADY_EXISTS")
+                .errorMessage(e.getMessage())
+                .details("User already liked this card")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("이미 좋아요한 카드입니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleIllegalArgumentException(
             IllegalArgumentException e) {
