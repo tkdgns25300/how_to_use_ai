@@ -64,4 +64,27 @@ public class CardController {
             throw e; // GlobalExceptionHandler에서 처리
         }
     }
+
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<ApiResponse<String>> deleteCard(
+            @PathVariable Long cardId,
+            @RequestParam("uuid") String uuid) {
+        
+        log.info("카드 삭제 API 호출: cardId={}, uuid={}", cardId, uuid);
+        
+        try {
+            cardService.deleteCard(cardId, uuid);
+            
+            ApiResponse<String> response = ResponseHelper.success(
+                "삭제 완료",
+                "카드가 성공적으로 삭제되었습니다."
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("카드 삭제 중 오류 발생: {}", e.getMessage(), e);
+            throw e; // GlobalExceptionHandler에서 처리
+        }
+    }
 } 

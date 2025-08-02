@@ -131,6 +131,33 @@ public class CardService {
         return convertToResponse(updatedCard);
     }
 
+    @Transactional
+    public void deleteCard(Long cardId, String uuid) {
+        log.info("카드 삭제 요청: cardId={}, uuid={}", cardId, uuid);
+
+        // 카드 존재 여부 확인
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 카드 삭제 시도: cardId={}", cardId);
+                    return new CardNotFoundException(
+                        String.format("카드를 찾을 수 없습니다: ID %d", cardId)
+                    );
+                });
+
+        // 권한 확인 (UUID가 일치하는지)
+        if (!card.getUuid().equals(uuid)) {
+            log.warn("권한 없는 사용자의 카드 삭제 시도: cardId={}, requestUuid={}, cardUuid={}", 
+                    cardId, uuid, card.getUuid());
+            throw new UnauthorizedAccessException(
+                String.format("카드 삭제 권한이 없습니다: ID %d", cardId)
+            );
+        }
+
+        // 카드 삭제
+        cardRepository.delete(card);
+        log.info("카드 삭제 완료: id={}, title={}", cardId, card.getTitle());
+    }
+
     private CardResponse convertToResponse(Card card) {
         CategoryResponse categoryResponse = CategoryResponse.builder()
                 .id(card.getCategory().getId())
