@@ -2,6 +2,9 @@ package sanghun.project.howtouseai.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,30 @@ import sanghun.project.howtouseai.service.CardService;
 public class CardController {
 
     private final CardService cardService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<CardResponse>>> getAllCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        log.info("카드 목록 조회 API 호출: page={}, size={}", page, size);
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<CardResponse> cards = cardService.getAllCards(pageable);
+            
+            ApiResponse<Page<CardResponse>> response = ResponseHelper.success(
+                cards,
+                "카드 목록을 성공적으로 조회했습니다."
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("카드 목록 조회 중 오류 발생: {}", e.getMessage(), e);
+            throw e; // GlobalExceptionHandler에서 처리
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<CardResponse>> createCard(

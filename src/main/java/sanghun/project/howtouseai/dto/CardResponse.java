@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardResponse {
-
     private Long id;
     private String uuid;
     private String title;
@@ -22,4 +22,6 @@ public class CardResponse {
     private String usageExamples;
     private String content;
     private LocalDateTime createdAt;
+    private Long likesCount;  // 좋아요 수
+    private List<String> likedUserUuids;  // 좋아요한 사용자 UUID 목록
 } 

@@ -24,4 +24,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findAllByOrderByCreatedAtDesc();
     
     boolean existsByTitleAndUuid(String title, String uuid);
+    
+    @Query("SELECT c FROM Card c ORDER BY " +
+           "(SELECT COUNT(cl) FROM CardLike cl WHERE cl.card.id = c.id) DESC, " +
+           "c.createdAt DESC")
+    Page<Card> findAllByOrderByLikesCountDescCreatedAtDesc(Pageable pageable);
 } 

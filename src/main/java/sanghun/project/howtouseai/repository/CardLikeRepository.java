@@ -12,12 +12,13 @@ import java.util.Optional;
 @Repository
 public interface CardLikeRepository extends JpaRepository<CardLike, Long> {
     
-    List<CardLike> findByCardId(Long cardId);
-    
     Optional<CardLike> findByCardIdAndUuid(Long cardId, String uuid);
     
-    @Query("SELECT COUNT(cl) FROM CardLike cl WHERE cl.card.id = :cardId")
-    long countByCardId(@Param("cardId") Long cardId);
-    
     boolean existsByCardIdAndUuid(Long cardId, String uuid);
+    
+    @Query("SELECT cl.uuid FROM CardLike cl WHERE cl.card.id = :cardId")
+    List<String> findUuidsByCardId(@Param("cardId") Long cardId);
+    
+    @Query("SELECT COUNT(cl) FROM CardLike cl WHERE cl.card.id = :cardId")
+    Long countByCardId(@Param("cardId") Long cardId);
 } 

@@ -2,6 +2,8 @@ package sanghun.project.howtouseai.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sanghun.project.howtouseai.domain.Card;
@@ -14,8 +16,12 @@ import sanghun.project.howtouseai.exception.CardAlreadyExistsException;
 import sanghun.project.howtouseai.exception.CardNotFoundException;
 import sanghun.project.howtouseai.exception.CategoryNotFoundException;
 import sanghun.project.howtouseai.exception.UnauthorizedAccessException;
+import sanghun.project.howtouseai.repository.CardLikeRepository;
 import sanghun.project.howtouseai.repository.CardRepository;
 import sanghun.project.howtouseai.repository.CategoryRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +31,16 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final CategoryRepository categoryRepository;
+    private final CardLikeRepository cardLikeRepository;
+
+    public Page<CardResponse> getAllCards(Pageable pageable) {
+        log.info("모든 카드 조회 요청: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        
+        Page<Card> cards = cardRepository.findAllByOrderByLikesCountDescCreatedAtDesc(pageable);
+        log.info("카드 조회 완료: totalElements={}, totalPages={}", cards.getTotalElements(), cards.getTotalPages());
+        
+        return cards.map(this::convertToResponse);
+    }
 
     @Transactional
     public CardResponse createCard(CardCreateRequest request) {
@@ -166,6 +182,10 @@ public class CardService {
                 .createdAt(card.getCategory().getCreatedAt())
                 .build();
 
+        // 좋아요 정보 조회
+        Long likesCount = cardLikeRepository.countByCardId(card.getId());
+        List<String> likedUserUuids = cardLikeRepository.findUuidsByCardId(card.getId());
+
         return CardResponse.builder()
                 .id(card.getId())
                 .uuid(card.getUuid())
@@ -176,6 +196,8 @@ public class CardService {
                 .usageExamples(card.getUsageExamples())
                 .content(card.getContent())
                 .createdAt(card.getCreatedAt())
+                .likesCount(likesCount)
+                .likedUserUuids(likedUserUuids)
                 .build();
     }
 } 
