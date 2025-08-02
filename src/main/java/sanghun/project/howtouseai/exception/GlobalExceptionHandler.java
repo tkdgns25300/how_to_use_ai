@@ -71,6 +71,48 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
     
+    @ExceptionHandler(CardNotFoundException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleCardNotFound(
+            CardNotFoundException e) {
+        
+        log.warn("카드 없음 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("CARD_NOT_FOUND")
+                .errorMessage(e.getMessage())
+                .details("Card not found in database")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("카드를 찾을 수 없습니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+    
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleUnauthorizedAccess(
+            UnauthorizedAccessException e) {
+        
+        log.warn("권한 없음 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("UNAUTHORIZED_ACCESS")
+                .errorMessage(e.getMessage())
+                .details("User does not have permission to access this resource")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("접근 권한이 없습니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+    
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleCategoryNotFound(
             CategoryNotFoundException e) {
