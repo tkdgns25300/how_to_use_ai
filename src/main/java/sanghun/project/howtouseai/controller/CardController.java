@@ -47,6 +47,26 @@ public class CardController {
         }
     }
 
+    @GetMapping("/{cardId}")
+    public ResponseEntity<ApiResponse<CardResponse>> getCardById(@PathVariable Long cardId) {
+        log.info("카드 상세 조회 API 호출: cardId={}", cardId);
+        
+        try {
+            CardResponse cardResponse = cardService.getCardById(cardId);
+            
+            ApiResponse<CardResponse> response = ResponseHelper.success(
+                cardResponse,
+                "카드 상세 정보를 성공적으로 조회했습니다."
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("카드 상세 조회 중 오류 발생: {}", e.getMessage(), e);
+            throw e; // GlobalExceptionHandler에서 처리
+        }
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<CardResponse>> createCard(
             @RequestBody CardCreateRequest request) {

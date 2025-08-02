@@ -42,6 +42,22 @@ public class CardService {
         return cards.map(this::convertToResponse);
     }
 
+    public CardResponse getCardById(Long cardId) {
+        log.info("카드 상세 조회 요청: cardId={}", cardId);
+        
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 카드 조회 시도: cardId={}", cardId);
+                    return new CardNotFoundException(
+                        String.format("카드를 찾을 수 없습니다: ID %d", cardId)
+                    );
+                });
+        
+        log.info("카드 상세 조회 완료: id={}, title={}", card.getId(), card.getTitle());
+        
+        return convertToResponse(card);
+    }
+
     @Transactional
     public CardResponse createCard(CardCreateRequest request) {
         log.info("카드 생성 요청: title={}, categoryId={}, uuid={}", 
