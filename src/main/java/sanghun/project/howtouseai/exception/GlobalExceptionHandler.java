@@ -92,6 +92,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
     
+    @ExceptionHandler(CardAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<ErrorResponse>> handleCardAlreadyExists(
+            CardAlreadyExistsException e) {
+        
+        log.warn("카드 중복 예외 발생: {}", e.getMessage());
+        
+        ErrorResponse errorData = ErrorResponse.builder()
+                .errorCode("DUPLICATE_CARD")
+                .errorMessage(e.getMessage())
+                .details("Card title already exists for this user")
+                .build();
+        
+        ApiResponse<ErrorResponse> response = ApiResponse.<ErrorResponse>builder()
+                .success(false)
+                .data(errorData)
+                .message("카드 생성에 실패했습니다.")
+                .build();
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+    
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleCategoryAlreadyExists(
             CategoryAlreadyExistsException e) {

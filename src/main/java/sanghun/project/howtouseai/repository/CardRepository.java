@@ -22,4 +22,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findByTagsContaining(@Param("tag") String tag);
     
     List<Card> findAllByOrderByCreatedAtDesc();
+    
+    boolean existsByTitleAndUuid(String title, String uuid);
 } 
