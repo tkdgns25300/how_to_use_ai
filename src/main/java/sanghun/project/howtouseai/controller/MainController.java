@@ -3,18 +3,21 @@ package sanghun.project.howtouseai.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class HomeController {
+public class MainController {
 
     @GetMapping("/")
-    @ResponseBody
-    public String home() {
-        log.info("홈페이지 접속");
-        return "AI 도구 가이드 웹사이트에 오신 것을 환영합니다!";
+    public String index(Model model) {
+        log.info("메인 페이지 접속");
+        
+        // TODO: 카드 데이터 로드
+        // TODO: 카테고리 데이터 로드
+        
+        return "index";
     }
 } 
