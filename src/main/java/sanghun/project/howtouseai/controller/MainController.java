@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import sanghun.project.howtouseai.service.CardService;
 import sanghun.project.howtouseai.service.CategoryService;
 
@@ -57,5 +58,25 @@ public class MainController {
         }
         
         return "card-form";
+    }
+
+    @GetMapping("/card/{cardId}")
+    public String cardDetail(@PathVariable Long cardId, Model model) {
+        log.info("Card detail page accessed: cardId={}", cardId);
+        
+        try {
+            // 카드 상세 정보 로드
+            var cardResponse = cardService.getCardById(cardId);
+            model.addAttribute("card", cardResponse);
+            
+            log.info("Card detail loaded: id={}, title={}", cardResponse.getId(), cardResponse.getTitle());
+            
+        } catch (Exception e) {
+            log.error("Error loading card detail: {}", e.getMessage(), e);
+            // 오류 발생 시 에러 페이지로 리다이렉트
+            return "redirect:/?error=card_not_found";
+        }
+        
+        return "card-detail";
     }
 } 
