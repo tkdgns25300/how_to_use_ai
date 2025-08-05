@@ -45,12 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (result.success) {
-                showSuccessMessage("카드가 성공적으로 등록되었습니다!");
+                showSuccessMessage("AI 사용법이 성공적으로 공유되었습니다!");
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 2000);
             } else {
-                showErrorMessage(result.message || "카드 등록에 실패했습니다.");
+                showErrorMessage(result.message || "사용법 공유에 실패했습니다.");
             }
         } catch (error) {
             console.error("카드 등록 오류:", error);
@@ -67,13 +67,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const description = form.querySelector("#description").value.trim();
 
         if (!title) {
-            showErrorMessage("AI 도구 이름을 입력해주세요.");
+            showErrorMessage("사용법 제목을 입력해주세요.");
             form.querySelector("#title").focus();
             return false;
         }
 
         if (!categoryId) {
-            showErrorMessage("카테고리를 선택해주세요.");
+            showErrorMessage("AI 도구 카테고리를 선택해주세요.");
             form.querySelector("#categoryId").focus();
             return false;
         }

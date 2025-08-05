@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>AI 도구 등록 - AI 도구 가이드</title>
+        <title>AI 사용법 공유 - AI 사용법 가이드</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
         <link rel="stylesheet" th:href="@{/css/form.css}" />
     </head>
@@ -11,8 +11,8 @@
         <!-- 헤더 섹션 -->
         <header class="header">
             <div class="container">
-                <h1 class="main-title">AI 도구 등록</h1>
-                <p class="subtitle">새로운 AI 도구를 등록해주세요</p>
+                <h1 class="main-title">AI 사용법 공유</h1>
+                <p class="subtitle">AI 도구 활용 팁을 다른 사람들과 공유해주세요</p>
                 <div class="cta-buttons">
                     <a href="/" class="btn btn-secondary">홈으로 돌아가기</a>
                 </div>
@@ -25,49 +25,75 @@
                 <div class="form-container">
                     <form id="cardForm" class="card-form">
                         <div class="form-group">
-                            <label for="title">AI 도구 이름 *</label>
-                            <input type="text" id="title" name="title" required 
-                                   placeholder="예: ChatGPT, Claude, Midjourney" />
+                            <label for="title">사용법 제목</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                required
+                                placeholder="예: ChatGPT로 이메일 작성하기, Midjourney로 로고 디자인하기"
+                            />
                         </div>
 
                         <div class="form-group">
-                            <label for="categoryId">카테고리 *</label>
+                            <label for="categoryId">카테고리</label>
                             <select id="categoryId" name="categoryId" required>
                                 <option value="">카테고리를 선택하세요</option>
-                                <option th:each="category : ${categories}" 
-                                        th:value="${category.id}" 
-                                        th:text="${category.name}">카테고리명</option>
+                                <option
+                                    th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:text="${category.name}"
+                                >
+                                    카테고리명
+                                </option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="description">간단한 설명 *</label>
-                            <textarea id="description" name="description" required 
-                                      placeholder="AI 도구에 대한 간단한 설명을 입력하세요"></textarea>
+                            <label for="description">간단한 설명</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                required
+                                placeholder="이 AI 도구를 어떻게 활용하는지 간단히 설명해주세요"
+                            ></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="tags">태그 (쉼표로 구분)</label>
-                            <input type="text" id="tags" name="tags" 
-                                   placeholder="예: AI챗봇, 텍스트생성, 대화형" />
+                            <label for="tags">관련 태그 (쉼표로 구분)</label>
+                            <input
+                                type="text"
+                                id="tags"
+                                name="tags"
+                                placeholder="예: 이메일작성, 업무효율, 텍스트생성"
+                            />
                         </div>
 
                         <div class="form-group">
-                            <label for="situation">사용 상황</label>
-                            <textarea id="situation" name="situation" 
-                                      placeholder="언제 사용하면 좋은지 설명해주세요"></textarea>
+                            <label for="situation">언제 사용하면 좋은가요?</label>
+                            <textarea
+                                id="situation"
+                                name="situation"
+                                placeholder="이 AI 도구를 언제, 어떤 상황에서 사용하면 효과적인지 설명해주세요"
+                            ></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="usageExamples">사용 예시</label>
-                            <textarea id="usageExamples" name="usageExamples" 
-                                      placeholder="구체적인 사용 예시를 입력하세요"></textarea>
+                            <label for="usageExamples">구체적인 사용 예시</label>
+                            <textarea
+                                id="usageExamples"
+                                name="usageExamples"
+                                placeholder="실제 사용할 때의 프롬프트나 단계별 방법을 설명해주세요"
+                            ></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="content">상세 내용</label>
-                            <textarea id="content" name="content" 
-                                      placeholder="AI 도구에 대한 상세한 설명을 입력하세요"></textarea>
+                            <label for="content">상세한 사용법</label>
+                            <textarea
+                                id="content"
+                                name="content"
+                                placeholder="더 자세한 사용법, 팁, 주의사항 등을 자유롭게 작성해주세요"
+                            ></textarea>
                         </div>
 
                         <div class="form-actions">
@@ -81,4 +107,4 @@
 
         <script th:src="@{/js/card-form.js}"></script>
     </body>
-</html> 
+</html>
