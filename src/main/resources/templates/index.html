@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>AI 사용법 가이드</title>
+        <title>AI Usage Guide</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
     </head>
     <body>
         <!-- 헤더 섹션 -->
         <header class="header">
             <div class="container">
-                <h1 class="main-title">AI 사용법 가이드</h1>
-                <p class="subtitle">다양한 AI 도구들의 활용 팁을 공유해보세요</p>
+                <h1 class="main-title">AI Usage Guide</h1>
+                <p class="subtitle">Share tips and tricks for using AI tools effectively</p>
                 <div class="cta-buttons">
-                    <a href="/card/new" class="btn btn-primary">사용법 공유하기</a>
-                    <button class="btn btn-secondary">가이드 보기</button>
+                    <a href="/card/new" class="btn btn-primary">Share Usage Tip</a>
+                    <button class="btn btn-secondary">View Guide</button>
                 </div>
             </div>
         </header>
@@ -25,8 +25,8 @@
                 <div class="cards-grid">
                     <!-- 카드가 없을 때 메시지 -->
                     <div th:if="${#lists.isEmpty(cards)}" class="no-cards">
-                        <p>아직 공유된 AI 사용법이 없습니다.</p>
-                        <p>첫 번째 사용법을 공유해보세요!</p>
+                        <p>No AI usage tips shared yet.</p>
+                        <p>Be the first to share your tip!</p>
                     </div>
 
                     <!-- 카드 데이터로 동적 렌더링 -->
@@ -42,32 +42,23 @@
                                 <span th:unless="${card.category.iconUrl != null}">🤖</span>
                             </div>
                             <div class="category-icon" th:unless="${card.category != null}">🤖</div>
-                            <h3 class="card-title" th:text="${card.title}">카드 제목</h3>
+                            <h3 class="card-title" th:text="${card.title}">Card Title</h3>
                         </div>
                         <div class="card-body">
-                            <p class="card-description" th:text="${card.description}">카드 설명</p>
+                            <p class="card-description" th:text="${card.content}">Card Description</p>
                             <div class="card-tags" th:if="${card.tags != null and #strings.length(card.tags) > 0}">
                                 <span
                                     th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
                                     class="tag"
                                     th:text="${'#' + tag.trim()}"
-                                    >#태그</span
+                                    >#tag</span
                                 >
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button
-                                class="like-button"
-                                th:data-card-id="${card.id}"
-                                th:data-uuid="${session.uuid}"
-                                th:class="${card.likedByUser ? 'like-button liked' : 'like-button'}"
-                            >
-                                <span
-                                    class="heart-icon"
-                                    th:class="${card.likedByUser ? 'heart-icon filled' : 'heart-icon'}"
-                                >
-                                    <span th:if="${card.likedByUser}">♥</span>
-                                    <span th:unless="${card.likedByUser}">♡</span>
+                            <button class="like-button" th:data-card-id="${card.id}" th:data-uuid="${session.uuid}">
+                                <span class="heart-icon">
+                                    <span>♡</span>
                                 </span>
                                 <span class="like-count" th:text="${card.likesCount}">0</span>
                             </button>

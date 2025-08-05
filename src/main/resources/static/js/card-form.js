@@ -45,16 +45,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (result.success) {
-                showSuccessMessage("AI 사용법이 성공적으로 공유되었습니다!");
+                showSuccessMessage("AI usage tip shared successfully!");
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 2000);
             } else {
-                showErrorMessage(result.message || "사용법 공유에 실패했습니다.");
+                showErrorMessage(result.message || "Failed to share usage tip.");
             }
         } catch (error) {
             console.error("카드 등록 오류:", error);
-            showErrorMessage("서버 오류가 발생했습니다. 다시 시도해주세요.");
+            showErrorMessage("Server error occurred. Please try again.");
         } finally {
             setLoadingState(false);
         }
@@ -67,19 +67,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const description = form.querySelector("#description").value.trim();
 
         if (!title) {
-            showErrorMessage("사용법 제목을 입력해주세요.");
+            showErrorMessage("Please enter a usage tip title.");
             form.querySelector("#title").focus();
             return false;
         }
 
         if (!categoryId) {
-            showErrorMessage("AI 도구 카테고리를 선택해주세요.");
+            showErrorMessage("Please select an AI tool category.");
             form.querySelector("#categoryId").focus();
             return false;
         }
 
         if (!description) {
-            showErrorMessage("간단한 설명을 입력해주세요.");
+            showErrorMessage("Please enter a brief description.");
             form.querySelector("#description").focus();
             return false;
         }
@@ -91,11 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function setLoadingState(loading) {
         if (loading) {
             form.classList.add("form-loading");
-            submitBtn.textContent = "등록 중...";
+            submitBtn.textContent = "Sharing...";
             submitBtn.disabled = true;
         } else {
             form.classList.remove("form-loading");
-            submitBtn.textContent = "등록하기";
+            submitBtn.textContent = "Share Tip";
             submitBtn.disabled = false;
         }
     }
