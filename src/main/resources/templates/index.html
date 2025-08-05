@@ -23,22 +23,52 @@
         <main class="main">
             <div class="container">
                 <div class="cards-grid">
-                    <!-- TODO: 카드 데이터로 동적 렌더링 -->
-                    <div class="card">
+                    <!-- 카드가 없을 때 메시지 -->
+                    <div th:if="${#lists.isEmpty(cards)}" class="no-cards">
+                        <p>등록된 AI 도구가 없습니다.</p>
+                    </div>
+
+                    <!-- 카드 데이터로 동적 렌더링 -->
+                    <div th:each="card : ${cards}" class="card">
                         <div class="card-header">
-                            <div class="category-icon">🤖</div>
-                            <h3 class="card-title">ChatGPT</h3>
+                            <div class="category-icon" th:if="${card.category != null}">
+                                <img
+                                    th:if="${card.category.iconUrl != null}"
+                                    th:src="${card.category.iconUrl}"
+                                    th:alt="${card.category.name}"
+                                    class="category-icon-img"
+                                />
+                                <span th:unless="${card.category.iconUrl != null}">🤖</span>
+                            </div>
+                            <div class="category-icon" th:unless="${card.category != null}">🤖</div>
+                            <h3 class="card-title" th:text="${card.title}">카드 제목</h3>
                         </div>
                         <div class="card-body">
-                            <p class="card-description">OpenAI의 대화형 AI 모델</p>
-                            <div class="card-tags">
-                                <span class="tag">#AI챗봇</span>
+                            <p class="card-description" th:text="${card.description}">카드 설명</p>
+                            <div class="card-tags" th:if="${card.tags != null and #strings.length(card.tags) > 0}">
+                                <span
+                                    th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
+                                    class="tag"
+                                    th:text="${'#' + tag.trim()}"
+                                    >#태그</span
+                                >
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button class="like-button" data-card-id="1">
-                                <span class="heart-icon">♡</span>
-                                <span class="like-count">24</span>
+                            <button
+                                class="like-button"
+                                th:data-card-id="${card.id}"
+                                th:data-uuid="${session.uuid}"
+                                th:class="${card.likedByUser ? 'like-button liked' : 'like-button'}"
+                            >
+                                <span
+                                    class="heart-icon"
+                                    th:class="${card.likedByUser ? 'heart-icon filled' : 'heart-icon'}"
+                                >
+                                    <span th:if="${card.likedByUser}">♥</span>
+                                    <span th:unless="${card.likedByUser}">♡</span>
+                                </span>
+                                <span class="like-count" th:text="${card.likesCount}">0</span>
                             </button>
                         </div>
                     </div>
