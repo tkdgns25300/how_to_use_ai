@@ -3,11 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const likeButton = document.querySelector(".like-button");
     const editButton = document.querySelector(".edit-btn");
 
-    // UUID 생성 또는 가져오기
-    let uuid = sessionStorage.getItem("userUuid");
+    // UUID 생성 또는 가져오기 (LocalStorage 사용)
+    let uuid = localStorage.getItem("userUuid");
     if (!uuid) {
         uuid = generateUUID();
-        sessionStorage.setItem("userUuid", uuid);
+        localStorage.setItem("userUuid", uuid);
     }
 
     // 권한 확인 및 Edit 버튼 표시/숨김

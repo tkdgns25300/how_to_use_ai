@@ -1,13 +1,13 @@
-// 카드 등록 폼 JavaScript
+// 카드 등록 페이지 JavaScript
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("cardForm");
     const submitBtn = form.querySelector('button[type="submit"]');
 
-    // UUID 생성 (세션에 저장)
-    let uuid = sessionStorage.getItem("userUuid");
+    // UUID 생성 또는 가져오기 (LocalStorage 사용)
+    let uuid = localStorage.getItem("userUuid");
     if (!uuid) {
         uuid = generateUUID();
-        sessionStorage.setItem("userUuid", uuid);
+        localStorage.setItem("userUuid", uuid);
     }
 
     // 폼 제출 이벤트
@@ -45,15 +45,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (result.success) {
-                showSuccessMessage("AI usage tip shared successfully!");
+                showSuccessMessage("Tip shared successfully!");
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 2000);
             } else {
-                showErrorMessage(result.message || "Failed to share usage tip.");
+                showErrorMessage(result.message || "Failed to share tip.");
             }
         } catch (error) {
-            console.error("카드 등록 오류:", error);
+            console.error("Submit error:", error);
             showErrorMessage("Server error occurred. Please try again.");
         } finally {
             setLoadingState(false);

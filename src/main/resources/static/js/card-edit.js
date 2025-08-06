@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('button[type="submit"]');
     const cardId = document.getElementById('cardId').value;
     
-    // UUID 생성 (세션에 저장)
-    let uuid = sessionStorage.getItem('userUuid');
+    // UUID 생성 또는 가져오기 (LocalStorage 사용)
+    let uuid = localStorage.getItem('userUuid');
     if (!uuid) {
         uuid = generateUUID();
-        sessionStorage.setItem('userUuid', uuid);
+        localStorage.setItem('userUuid', uuid);
     }
     
     // 폼 제출 이벤트 (수정)
@@ -167,11 +167,11 @@ async function deleteCard() {
     }
     
     try {
-        // UUID 가져오기
-        let uuid = sessionStorage.getItem('userUuid');
+        // UUID 가져오기 (LocalStorage 사용)
+        let uuid = localStorage.getItem('userUuid');
         if (!uuid) {
             uuid = generateUUID();
-            sessionStorage.setItem('userUuid', uuid);
+            localStorage.setItem('userUuid', uuid);
         }
         
         const response = await fetch(`/api/cards/${cardId}?uuid=${uuid}`, {
