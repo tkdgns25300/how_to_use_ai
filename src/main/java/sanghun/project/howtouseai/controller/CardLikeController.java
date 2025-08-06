@@ -9,6 +9,8 @@ import sanghun.project.howtouseai.dto.ApiResponse;
 import sanghun.project.howtouseai.dto.ResponseHelper;
 import sanghun.project.howtouseai.service.CardLikeService;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/cards")
@@ -20,8 +22,9 @@ public class CardLikeController {
     @PostMapping("/{cardId}/like")
     public ResponseEntity<ApiResponse<String>> addLike(
             @PathVariable Long cardId,
-            @RequestParam("uuid") String uuid) {
+            @RequestBody Map<String, String> request) {
         
+        String uuid = request.get("uuid");
         log.info("좋아요 추가 API 호출: cardId={}, uuid={}", cardId, uuid);
         
         try {

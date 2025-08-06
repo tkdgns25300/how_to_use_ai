@@ -175,36 +175,56 @@ body {
 .like-button {
     display: flex;
     align-items: center;
-    gap: 5px;
-    background: none;
-    border: none;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 20px;
+    background-color: white;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .like-button:hover {
-    background-color: #f8f9fa;
+    border-color: #e74c3c;
+    color: #e74c3c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
 }
 
 .like-button.liked {
-    background-color: #fff5f5;
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+
+.like-button.liked:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
 }
 
 .heart-icon {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 16px;
+    transition: transform 0.3s ease;
 }
 
-.heart-icon.filled {
-    color: #e53e3e;
+.like-button:hover .heart-icon {
+    transform: scale(1.1);
+}
+
+.like-button.liked .heart-icon {
+    transform: scale(1.1);
 }
 
 .like-count {
-    font-size: 0.9rem;
-    color: #666;
-    font-weight: 500;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
 }
 
 /* 카드가 없을 때 메시지 */

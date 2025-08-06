@@ -56,7 +56,12 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button class="like-button" th:data-card-id="${card.id}" th:data-uuid="${session.uuid}">
+                            <button
+                                class="like-button"
+                                th:data-card-id="${card.id}"
+                                th:data-uuid="${session.uuid != null ? session.uuid : ''}"
+                                th:data-liked-uuids="${card.likedUserUuids != null ? #strings.arrayJoin(card.likedUserUuids, ',') : ''}"
+                            >
                                 <span class="heart-icon">
                                     <span>♡</span>
                                 </span>

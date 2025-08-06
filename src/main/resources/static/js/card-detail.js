@@ -25,28 +25,36 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // 좋아요 상태 초기화
+    initializeLikeState();
+
     // 좋아요 버튼 이벤트
     if (likeButton) {
         likeButton.addEventListener("click", async function () {
             const cardId = this.getAttribute("data-card-id");
+            const isLiked = this.classList.contains("liked");
 
             try {
-                const response = await fetch(`/api/cards/${cardId}/like`, {
-                    method: "POST",
+                const url = isLiked ? `/api/cards/${cardId}/like?uuid=${uuid}` : `/api/cards/${cardId}/like`;
+                const method = isLiked ? "DELETE" : "POST";
+                const body = isLiked ? null : JSON.stringify({ uuid: uuid });
+
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ uuid: uuid }),
+                    body: body,
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    // 좋아요 성공 시 UI 업데이트
-                    updateLikeUI(true);
-                    showMessage("Tip liked successfully!", "success");
+                    // 좋아요 상태 토글
+                    toggleLikeState(!isLiked);
+                    showMessage(isLiked ? "Like removed!" : "Tip liked successfully!", "success");
                 } else {
-                    showMessage(result.message || "Failed to like tip.", "error");
+                    showMessage(result.message || "Failed to update like.", "error");
                 }
             } catch (error) {
                 console.error("Like error:", error);
@@ -55,15 +63,63 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // 좋아요 상태 초기화
+    function initializeLikeState() {
+        if (!likeButton) return;
+
+        const cardId = likeButton.getAttribute("data-card-id");
+        const likedUserUuidsStr = likeButton.getAttribute("data-liked-uuids") || "[]";
+        let likedUserUuids = [];
+
+        try {
+            if (likedUserUuidsStr && likedUserUuidsStr.trim() !== "") {
+                likedUserUuids = likedUserUuidsStr.split(",").filter((uuid) => uuid.trim() !== "");
+            }
+        } catch (error) {
+            console.error("Error parsing liked UUIDs:", error);
+            likedUserUuids = [];
+        }
+
+        // 현재 사용자가 좋아요를 눌렀는지 확인
+        const isLiked = likedUserUuids.includes(uuid);
+        updateLikeUI(isLiked);
+
+        console.log("Like state initialized:", {
+            cardId: cardId,
+            userUuid: uuid,
+            likedUserUuids: likedUserUuids,
+            isLiked: isLiked,
+        });
+    }
+
+    // 좋아요 상태 토글
+    function toggleLikeState(isLiked) {
+        updateLikeUI(isLiked);
+
+        // 좋아요 수 업데이트
+        const likeCountElement = document.querySelector(".like-count");
+        if (likeCountElement) {
+            const currentCount = parseInt(likeCountElement.textContent);
+            const newCount = isLiked ? currentCount + 1 : currentCount - 1;
+            likeCountElement.textContent = newCount + " likes";
+        }
+    }
+
     // 좋아요 UI 업데이트
     function updateLikeUI(liked) {
         const heartIcon = likeButton.querySelector(".heart-icon span");
+        const likeText = likeButton.querySelector(".like-text");
+
         if (liked) {
             heartIcon.textContent = "♥";
             heartIcon.style.color = "#e74c3c";
+            likeButton.classList.add("liked");
+            if (likeText) likeText.textContent = "Liked";
         } else {
             heartIcon.textContent = "♡";
             heartIcon.style.color = "#666";
+            likeButton.classList.remove("liked");
+            if (likeText) likeText.textContent = "Like this tip";
         }
     }
 
@@ -179,6 +235,16 @@ style.textContent = `
     @keyframes slideOut {
         from { transform: translateX(0); opacity: 1; }
         to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .like-button.liked {
+        background-color: #e74c3c !important;
+        border-color: #e74c3c !important;
+        color: white !important;
+    }
+    
+    .like-button.liked .like-text {
+        color: white !important;
     }
 `;
 document.head.appendChild(style);
