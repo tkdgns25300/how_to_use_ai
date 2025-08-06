@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title th:text="'Edit ' + ${card.title} + ' - AI Usage Guide'">Edit Card - AI Usage Guide</title>
+        <link rel="stylesheet" th:href="@{/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/css/form.css}" />
+    </head>
+    <body>
+        <!-- 헤더 섹션 -->
+        <header class="header">
+            <div class="container">
+                <h1 class="main-title">Edit AI Usage Tip</h1>
+                <p class="subtitle">Update your AI usage tip</p>
+                <div class="cta-buttons">
+                    <a th:href="@{/card/{cardId}(cardId=${card.id})}" class="btn btn-secondary">Back to Detail</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 카드 수정 폼 -->
+        <main class="main">
+            <div class="container">
+                <div class="form-container">
+                    <form id="cardForm" class="card-form">
+                        <input type="hidden" id="cardId" th:value="${card.id}" />
+
+                        <div class="form-group">
+                            <label for="title">Usage Tip Title *</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                required
+                                th:value="${card.title}"
+                                placeholder="e.g., Write emails with ChatGPT, Design logos with Midjourney"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categoryId">AI Tool Category *</label>
+                            <select id="categoryId" name="categoryId" required>
+                                <option value="">Select AI tool category</option>
+                                <option
+                                    th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:text="${category.name}"
+                                    th:selected="${category.id == card.category.id}"
+                                >
+                                    Category Name
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Brief Description *</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                required
+                                placeholder="Briefly explain how to use this AI tool effectively"
+                                th:text="${card.content}"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tags">Related Tags (comma separated)</label>
+                            <input
+                                type="text"
+                                id="tags"
+                                name="tags"
+                                th:value="${card.tags}"
+                                placeholder="e.g., email writing, productivity, text generation"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="situation">When to Use This Tip</label>
+                            <textarea
+                                id="situation"
+                                name="situation"
+                                placeholder="Explain when and in what situations this AI tool is most effective"
+                                th:text="${card.situation}"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usageExamples">Specific Usage Examples</label>
+                            <textarea
+                                id="usageExamples"
+                                name="usageExamples"
+                                placeholder="Provide step-by-step instructions or specific prompts to use"
+                                th:text="${card.usageExamples}"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="content">Detailed Usage Guide</label>
+                            <textarea
+                                id="content"
+                                name="content"
+                                placeholder="Share detailed tips, best practices, and important notes"
+                                th:text="${card.content}"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Update Tip</button>
+                            <button type="button" class="btn btn-danger" onclick="deleteCard()">Delete Tip</button>
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <script th:src="@{/js/card-edit.js}"></script>
+    </body>
+</html>

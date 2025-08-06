@@ -79,4 +79,28 @@ public class MainController {
         
         return "card-detail";
     }
+
+    @GetMapping("/card/{cardId}/edit")
+    public String cardEdit(@PathVariable Long cardId, Model model) {
+        log.info("Card edit page accessed: cardId={}", cardId);
+        
+        try {
+            // 카드 상세 정보 로드
+            var cardResponse = cardService.getCardById(cardId);
+            model.addAttribute("card", cardResponse);
+            
+            // 카테고리 목록 로드
+            var categories = categoryService.getAllCategories();
+            model.addAttribute("categories", categories);
+            
+            log.info("Card edit form loaded: id={}, title={}", cardResponse.getId(), cardResponse.getTitle());
+            
+        } catch (Exception e) {
+            log.error("Error loading card edit form: {}", e.getMessage(), e);
+            // 오류 발생 시 에러 페이지로 리다이렉트
+            return "redirect:/?error=card_not_found";
+        }
+        
+        return "card-edit";
+    }
 } 

@@ -81,6 +81,18 @@
     min-width: 120px;
 }
 
+/* 위험 버튼 스타일 */
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: 2px solid #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
 /* 플레이스홀더 스타일 */
 .form-group input::placeholder,
 .form-group textarea::placeholder {

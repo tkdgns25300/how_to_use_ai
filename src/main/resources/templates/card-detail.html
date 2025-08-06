@@ -41,7 +41,9 @@
                         </div>
                         <h1 class="card-title" th:text="${card.title}">Card Title</h1>
                         <div class="card-meta">
-                            <span class="created-date" th:text="${#temporals.format(card.createdAt, 'MMM dd, yyyy')}">Created Date</span>
+                            <span class="created-date" th:text="${#temporals.format(card.createdAt, 'MMM dd, yyyy')}"
+                                >Created Date</span
+                            >
                             <div class="like-info">
                                 <span class="like-count" th:text="${card.likesCount + ' likes'}">0 likes</span>
                             </div>
@@ -51,7 +53,10 @@
                     <!-- 카드 내용 -->
                     <div class="card-content">
                         <!-- 간단한 설명 -->
-                        <div class="content-section" th:if="${card.content != null and #strings.length(card.content) > 0}">
+                        <div
+                            class="content-section"
+                            th:if="${card.content != null and #strings.length(card.content) > 0}"
+                        >
                             <h3>Description</h3>
                             <p th:text="${card.content}">Content description</p>
                         </div>
@@ -64,18 +69,25 @@
                                     th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
                                     class="tag"
                                     th:text="${'#' + tag.trim()}"
-                                >#tag</span>
+                                    >#tag</span
+                                >
                             </div>
                         </div>
 
                         <!-- 사용 상황 -->
-                        <div class="content-section" th:if="${card.situation != null and #strings.length(card.situation) > 0}">
+                        <div
+                            class="content-section"
+                            th:if="${card.situation != null and #strings.length(card.situation) > 0}"
+                        >
                             <h3>When to Use This Tip</h3>
                             <p th:text="${card.situation}">Usage situation</p>
                         </div>
 
                         <!-- 사용 예시 -->
-                        <div class="content-section" th:if="${card.usageExamples != null and #strings.length(card.usageExamples) > 0}">
+                        <div
+                            class="content-section"
+                            th:if="${card.usageExamples != null and #strings.length(card.usageExamples) > 0}"
+                        >
                             <h3>Specific Usage Examples</h3>
                             <div class="usage-examples">
                                 <pre th:text="${card.usageExamples}">Usage examples</pre>
@@ -92,6 +104,13 @@
                             <span class="like-text">Like this tip</span>
                         </button>
                         <div class="share-section">
+                            <a
+                                th:data-card-uuid="${card.uuid}"
+                                th:href="@{/card/{cardId}/edit(cardId=${card.id})}"
+                                class="btn btn-primary edit-btn"
+                                style="display: none"
+                                >Edit Tip</a
+                            >
                             <button class="btn btn-secondary" onclick="shareTip()">Share</button>
                         </div>
                     </div>
@@ -101,4 +120,4 @@
 
         <script th:src="@{/js/card-detail.js}"></script>
     </body>
-</html> 
+</html>
