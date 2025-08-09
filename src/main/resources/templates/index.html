@@ -30,7 +30,7 @@
                     </div>
 
                     <!-- 카드 데이터로 동적 렌더링 -->
-                    <div th:each="card : ${cards}" class="card">
+                    <div th:each="card : ${cards}" class="card clickable-card" th:data-card-id="${card.id}">
                         <div class="card-header">
                             <div class="category-icon" th:if="${card.category != null}">
                                 <img
@@ -67,9 +67,6 @@
                                 </span>
                                 <span class="like-count" th:text="${card.likesCount}">0</span>
                             </button>
-                            <a th:href="@{/card/{cardId}(cardId=${card.id})}" class="btn btn-secondary btn-sm"
-                                >View Details</a
-                            >
                         </div>
                     </div>
                 </div>

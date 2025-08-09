@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 좋아요 버튼 이벤트 리스너 추가
     initializeLikeButtons();
 
+    // 카드 클릭 이벤트 리스너 추가
+    initializeCardClickEvents();
+
     // 좋아요 버튼 초기화
     function initializeLikeButtons() {
         const likeButtons = document.querySelectorAll(".like-button");
@@ -183,6 +186,31 @@ document.addEventListener("DOMContentLoaded", function () {
             messageDiv.style.animation = "slideOut 0.3s ease";
             setTimeout(() => messageDiv.remove(), 300);
         }, 3000);
+    }
+
+    // 카드 클릭 이벤트 초기화
+    function initializeCardClickEvents() {
+        const cards = document.querySelectorAll(".clickable-card");
+        console.log("Found clickable cards:", cards.length);
+
+        cards.forEach((card, index) => {
+            card.addEventListener("click", handleCardClick);
+            console.log(`Card ${index + 1} click event listener added`);
+        });
+    }
+
+    // 카드 클릭 핸들러
+    function handleCardClick(event) {
+        // 좋아요 버튼 클릭은 무시
+        if (event.target.closest(".like-button")) {
+            return;
+        }
+
+        const cardId = this.getAttribute("data-card-id");
+        if (cardId) {
+            console.log("Navigating to card detail:", cardId);
+            window.location.href = `/card/${cardId}`;
+        }
     }
 
     // UUID 생성 함수
