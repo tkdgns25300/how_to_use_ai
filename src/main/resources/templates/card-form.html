@@ -11,10 +11,12 @@
         <!-- 헤더 섹션 -->
         <header class="header">
             <div class="container">
-                <h1 class="main-title">Share AI Usage Tip</h1>
-                <p class="subtitle">Share your tips and tricks for using AI tools effectively</p>
-                <div class="cta-buttons">
-                    <a href="/" class="btn btn-secondary">Back to Home</a>
+                <div class="header-content">
+                    <a href="/" class="btn btn-back">←</a>
+                    <div class="create-info">
+                        <div class="create-icon">✨</div>
+                        <h1 class="create-title">Share AI Usage Tip</h1>
+                    </div>
                 </div>
             </div>
         </header>
@@ -22,77 +24,103 @@
         <!-- 카드 등록 폼 -->
         <main class="main">
             <div class="container">
-                <div class="form-container">
-                    <form id="cardForm" class="card-form">
-                        <div class="form-group">
-                            <label for="title">Usage Tip Title *</label>
-                            <input
-                                type="text"
-                                id="title"
-                                name="title"
-                                required
-                                maxlength="20"
-                                placeholder="e.g., Write emails with ChatGPT, Design logos with Midjourney"
-                            />
+                <div class="create-grid">
+                    <!-- 좌측: 기본 정보 -->
+                    <div class="create-block block-large">
+                        <div class="block-header">
+                            <span class="block-icon">📝</span>
+                            <h2>Basic Information</h2>
                         </div>
+                        <form id="cardForm" class="card-form">
+                            <div class="form-group">
+                                <label for="title">Usage Tip Title *</label>
+                                <input
+                                    type="text"
+                                    id="title"
+                                    name="title"
+                                    required
+                                    maxlength="20"
+                                    placeholder="e.g., Write emails with ChatGPT"
+                                />
+                            </div>
 
-                        <div class="form-group">
-                            <label for="categoryId">AI Tool Category *</label>
-                            <select id="categoryId" name="categoryId" required>
-                                <option value="">Select AI tool category</option>
-                                <option
-                                    th:each="category : ${categories}"
-                                    th:value="${category.id}"
-                                    th:text="${category.name}"
-                                >
-                                    Category Name
-                                </option>
-                            </select>
-                        </div>
+                            <div class="form-group">
+                                <label for="categoryId">AI Tool Category *</label>
+                                <select id="categoryId" name="categoryId" required>
+                                    <option value="">Select AI tool category</option>
+                                    <option
+                                        th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"
+                                    >
+                                        Category Name
+                                    </option>
+                                </select>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="content">Usage Tip Description *</label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                required
-                                placeholder="Explain how to use this AI tool effectively"
-                            ></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label for="content">Usage Tip Description *</label>
+                                <textarea
+                                    id="content"
+                                    name="content"
+                                    required
+                                    placeholder="Explain how to use this AI tool effectively"
+                                ></textarea>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="tags">Related Tags (comma separated)</label>
-                            <input
-                                type="text"
-                                id="tags"
-                                name="tags"
-                                placeholder="e.g., email writing, productivity, text generation"
-                            />
-                        </div>
+                            <div class="form-group">
+                                <label for="tags">Related Tags (comma separated)</label>
+                                <input
+                                    type="text"
+                                    id="tags"
+                                    name="tags"
+                                    placeholder="e.g., email writing, productivity, text generation"
+                                />
+                            </div>
 
-                        <div class="form-group">
-                            <label for="situation">When to Use This Tip</label>
-                            <textarea
-                                id="situation"
-                                name="situation"
-                                placeholder="Explain when and in what situations this AI tool is most effective"
-                            ></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label for="situation">When to Use This Tip *</label>
+                                <textarea
+                                    id="situation"
+                                    name="situation"
+                                    required
+                                    placeholder="Explain when and in what situations this AI tool is most effective"
+                                ></textarea>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="usageExamples">Specific Usage Examples</label>
-                            <textarea
-                                id="usageExamples"
-                                name="usageExamples"
-                                placeholder="Provide step-by-step instructions or specific prompts to use"
-                            ></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label for="usageExamples">Specific Usage Examples *</label>
+                                <textarea
+                                    id="usageExamples"
+                                    name="usageExamples"
+                                    required
+                                    placeholder="Provide step-by-step instructions or specific prompts to use"
+                                ></textarea>
+                            </div>
 
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Share Tip</button>
-                            <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                            <!-- 폼 액션 버튼을 폼 안으로 이동 -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Share Tip</button>
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 우측: 추가 정보 -->
+                    <div class="create-block block-small">
+                        <div class="block-header">
+                            <span class="block-icon">🔍</span>
+                            <h2>Additional Information</h2>
                         </div>
-                    </form>
+                        <div class="info-note">
+                            <p>
+                                Fields marked with * are required. Tags are optional but recommended for better
+                                categorization.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 하단 액션 버튼 블록 제거 (폼 안으로 이동됨) -->
                 </div>
             </div>
         </main>

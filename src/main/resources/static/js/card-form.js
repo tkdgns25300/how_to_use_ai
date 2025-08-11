@@ -1,7 +1,24 @@
 // 카드 등록 페이지 JavaScript
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM loaded, initializing form..."); // 디버깅용 로그
+
     const form = document.getElementById("cardForm");
+
+    if (!form) {
+        console.error("Form not found");
+        return;
+    }
+
+    console.log("Form found:", form); // 디버깅용 로그
+
     const submitBtn = form.querySelector('button[type="submit"]');
+
+    if (!submitBtn) {
+        console.error("Submit button not found");
+        return;
+    }
+
+    console.log("Submit button found:", submitBtn); // 디버깅용 로그
 
     // UUID 생성 또는 가져오기 (LocalStorage 사용)
     let uuid = localStorage.getItem("userUuid");
@@ -10,13 +27,20 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("userUuid", uuid);
     }
 
+    console.log("User UUID:", uuid); // 디버깅용 로그
+
     // 폼 제출 이벤트
     form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+        console.log("Form submit event triggered"); // 디버깅용 로그
+        e.preventDefault(); // 기본 제출 방지
+        console.log("Default form submission prevented"); // 디버깅용 로그
 
         if (!validateForm()) {
+            console.log("Form validation failed"); // 디버깅용 로그
             return;
         }
+
+        console.log("Form validation passed, proceeding with submission"); // 디버깅용 로그
 
         // 로딩 상태 설정
         setLoadingState(true);
@@ -33,37 +57,63 @@ document.addEventListener("DOMContentLoaded", function () {
                 uuid: uuid,
             };
 
+            console.log("Submitting card data:", cardData); // 디버깅용 로그
+
             const response = await fetch("/api/cards", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Accept: "application/json",
                 },
                 body: JSON.stringify(cardData),
             });
 
-            const result = await response.json();
+            console.log("Response status:", response.status); // 디버깅용 로그
 
-            if (result.success) {
-                showSuccessMessage("Tip shared successfully!");
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 2000);
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Response result:", result); // 디버깅용 로그
+
+                if (result.success) {
+                    showSuccessMessage("Tip shared successfully!");
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 2000);
+                } else {
+                    showErrorMessage(result.message || "Failed to share tip.");
+                }
             } else {
-                showErrorMessage(result.message || "Failed to share tip.");
+                let errorMessage = `Server error: ${response.status}`;
+                try {
+                    const errorResult = await response.json();
+                    if (errorResult.message) {
+                        errorMessage = errorResult.message;
+                    } else if (errorResult.errorMessage) {
+                        errorMessage = errorResult.errorMessage;
+                    }
+                } catch (parseError) {
+                    const errorText = await response.text();
+                    errorMessage = `Server error: ${response.status} - ${errorText}`;
+                }
+                showErrorMessage(errorMessage);
             }
         } catch (error) {
             console.error("Submit error:", error);
-            showErrorMessage("Server error occurred. Please try again.");
+            showErrorMessage("Network error occurred. Please try again.");
         } finally {
             setLoadingState(false);
         }
     });
+
+    console.log("Form submit event listener added"); // 디버깅용 로그
 
     // 폼 유효성 검사
     function validateForm() {
         const title = form.querySelector("#title").value.trim();
         const categoryId = form.querySelector("#categoryId").value;
         const content = form.querySelector("#content").value.trim();
+        const situation = form.querySelector("#situation").value.trim();
+        const usageExamples = form.querySelector("#usageExamples").value.trim();
 
         if (!title) {
             showErrorMessage("Please enter a usage tip title.");
@@ -83,11 +133,25 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
+        if (!situation) {
+            showErrorMessage("Please explain when to use this tip.");
+            form.querySelector("#situation").focus();
+            return false;
+        }
+
+        if (!usageExamples) {
+            showErrorMessage("Please provide specific usage examples.");
+            form.querySelector("#usageExamples").focus();
+            return false;
+        }
+
         return true;
     }
 
     // 로딩 상태 설정
     function setLoadingState(loading) {
+        if (!submitBtn) return;
+
         if (loading) {
             form.classList.add("form-loading");
             submitBtn.textContent = "Sharing...";
