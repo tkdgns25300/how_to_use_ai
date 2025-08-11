@@ -185,6 +185,11 @@ public class CardService {
             );
         }
 
+        // 관련된 좋아요 데이터 먼저 삭제
+        log.info("카드 관련 좋아요 데이터 삭제 시작: cardId={}", cardId);
+        cardLikeRepository.deleteByCardId(cardId);
+        log.info("카드 관련 좋아요 데이터 삭제 완료: cardId={}", cardId);
+
         // 카드 삭제
         cardRepository.delete(card);
         log.info("카드 삭제 완료: id={}, title={}", cardId, card.getTitle());

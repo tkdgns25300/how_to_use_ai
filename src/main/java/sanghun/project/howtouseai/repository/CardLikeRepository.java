@@ -21,4 +21,7 @@ public interface CardLikeRepository extends JpaRepository<CardLike, Long> {
     
     @Query("SELECT COUNT(cl) FROM CardLike cl WHERE cl.card.id = :cardId")
     Long countByCardId(@Param("cardId") Long cardId);
+    
+    // 카드 ID로 모든 좋아요 데이터 삭제
+    void deleteByCardId(Long cardId);
 } 

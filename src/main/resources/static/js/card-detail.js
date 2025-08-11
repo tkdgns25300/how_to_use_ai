@@ -85,7 +85,49 @@ function initializeEditDeleteButtons() {
         if (userUuid && cardUuid === userUuid) {
             editButton.style.display = "inline-block";
             deleteButton.style.display = "inline-block";
+
+            // Delete 버튼에 이벤트 리스너 추가
+            deleteButton.addEventListener("click", handleDeleteClick);
         }
+    }
+}
+
+// Delete 버튼 클릭 처리
+function handleDeleteClick() {
+    const deleteButton = document.querySelector(".btn-delete");
+    const cardId = deleteButton.getAttribute("data-card-id");
+
+    if (confirm("Are you sure you want to delete this tip?")) {
+        deleteCard(cardId);
+    }
+}
+
+// 카드 삭제 기능
+async function deleteCard(cardId) {
+    try {
+        const response = await fetch(`/api/cards/${cardId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uuid: getUuid() }),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                alert("Tip deleted successfully!");
+                window.location.href = "/";
+            } else {
+                alert("Failed to delete tip: " + (result.message || "Unknown error"));
+            }
+        } else {
+            const errorData = await response.json();
+            alert("Failed to delete tip: " + (errorData.message || "Server error"));
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while deleting the tip.");
     }
 }
 
@@ -162,32 +204,4 @@ function showCopyMessage(message) {
     setTimeout(() => {
         messageDiv.remove();
     }, 2000);
-}
-
-// 카드 삭제 기능
-function deleteCard() {
-    if (confirm("Are you sure you want to delete this tip?")) {
-        const cardId = document.getElementById("cardId").value;
-        const uuid = getUuid();
-
-        fetch(`/api/cards/${cardId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ uuid: uuid }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    alert("Tip deleted successfully!");
-                    window.location.href = "/";
-                } else {
-                    alert("Failed to delete tip.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("An error occurred while deleting the tip.");
-            });
-    }
 }

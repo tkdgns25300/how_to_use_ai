@@ -115,8 +115,9 @@ public class CardController {
     @DeleteMapping("/{cardId}")
     public ResponseEntity<ApiResponse<String>> deleteCard(
             @PathVariable Long cardId,
-            @RequestParam("uuid") String uuid) {
+            @RequestBody java.util.Map<String, String> request) {
         
+        String uuid = request.get("uuid");
         log.info("카드 삭제 API 호출: cardId={}, uuid={}", cardId, uuid);
         
         try {
