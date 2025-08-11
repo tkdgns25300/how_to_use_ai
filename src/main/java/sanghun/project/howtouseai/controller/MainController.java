@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import sanghun.project.howtouseai.service.CardService;
 import sanghun.project.howtouseai.service.CategoryService;
 
+import jakarta.servlet.http.HttpSession;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -20,20 +22,20 @@ public class MainController {
     private final CategoryService categoryService;
 
     @GetMapping("/")
-    public String index(Model model) {
+    public String index(Model model, HttpSession session) {
         log.info("Main page accessed");
         
+        String userUuid = getOrCreateUserUuid(session);
+
         try {
-            // 카드 데이터 로드 (첫 20개 카드)
             Pageable pageable = PageRequest.of(0, 20);
-            var cardsResponse = cardService.getAllCards(pageable);
-            model.addAttribute("cards", cardsResponse.getContent());
+            var cards = cardService.getCardsForHomePage(pageable, userUuid);
+            model.addAttribute("cards", cards);
             
-            log.info("Loaded {} cards", cardsResponse.getContent().size());
+            log.info("Loaded {} cards", cards.size());
             
         } catch (Exception e) {
             log.error("Error loading card data: {}", e.getMessage(), e);
-            // 오류 발생 시 빈 리스트로 초기화
             model.addAttribute("cards", java.util.Collections.emptyList());
         }
         
@@ -61,19 +63,19 @@ public class MainController {
     }
 
     @GetMapping("/card/{cardId}")
-    public String cardDetail(@PathVariable Long cardId, Model model) {
+    public String cardDetail(@PathVariable Long cardId, Model model, HttpSession session) {
         log.info("Card detail page accessed: cardId={}", cardId);
         
+        String userUuid = getOrCreateUserUuid(session);
+
         try {
-            // 카드 상세 정보 로드
-            var cardResponse = cardService.getCardById(cardId);
+            var cardResponse = cardService.getCardById(cardId, userUuid);
             model.addAttribute("card", cardResponse);
             
             log.info("Card detail loaded: id={}, title={}", cardResponse.getId(), cardResponse.getTitle());
             
         } catch (Exception e) {
             log.error("Error loading card detail: {}", e.getMessage(), e);
-            // 오류 발생 시 에러 페이지로 리다이렉트
             return "redirect:/?error=card_not_found";
         }
         
@@ -81,12 +83,14 @@ public class MainController {
     }
 
     @GetMapping("/card/{cardId}/edit")
-    public String cardEdit(@PathVariable Long cardId, Model model) {
+    public String cardEdit(@PathVariable Long cardId, Model model, HttpSession session) {
         log.info("Card edit page accessed: cardId={}", cardId);
         
+        String userUuid = getOrCreateUserUuid(session);
+
         try {
             // 카드 상세 정보 로드
-            var cardResponse = cardService.getCardById(cardId);
+            var cardResponse = cardService.getCardById(cardId, userUuid);
             model.addAttribute("card", cardResponse);
             
             // 카테고리 목록 로드
@@ -102,5 +106,15 @@ public class MainController {
         }
         
         return "card-edit";
+    }
+    
+    private String getOrCreateUserUuid(HttpSession session) {
+        String uuid = (String) session.getAttribute("uuid");
+        if (uuid == null) {
+            uuid = java.util.UUID.randomUUID().toString();
+            session.setAttribute("uuid", uuid);
+            log.info("New user UUID created: {}", uuid);
+        }
+        return uuid;
     }
 } 

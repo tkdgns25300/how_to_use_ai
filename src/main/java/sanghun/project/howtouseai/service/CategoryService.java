@@ -26,12 +26,15 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
 
+    /**
+     * 모든 카테고리를 이름 오름차순으로 조회합니다.
+     *
+     * @return 카테고리 응답 DTO 리스트
+     */
     public List<CategoryResponse> getAllCategories() {
         log.info("모든 카테고리 조회 요청");
-        
         List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
         log.info("카테고리 조회 완료: count={}", categories.size());
-        
         return categories.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());

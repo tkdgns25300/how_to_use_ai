@@ -23,5 +23,6 @@ public class CardResponse {
     private String content;
     private LocalDateTime createdAt;
     private Long likesCount;  // 좋아요 수
+    private boolean likedByUser; // 현재 사용자의 좋아요 여부
     private List<String> likedUserUuids;  // 좋아요한 사용자 UUID 목록
 } 

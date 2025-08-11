@@ -19,9 +19,13 @@ import sanghun.project.howtouseai.exception.UnauthorizedAccessException;
 import sanghun.project.howtouseai.repository.CardLikeRepository;
 import sanghun.project.howtouseai.repository.CardRepository;
 import sanghun.project.howtouseai.repository.CategoryRepository;
+import sanghun.project.howtouseai.dto.CardLikeCountDto;
+import sanghun.project.howtouseai.domain.CardLike;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -33,29 +37,76 @@ public class CardService {
     private final CategoryRepository categoryRepository;
     private final CardLikeRepository cardLikeRepository;
 
+    /**
+     * 모든 카드 정보를 조회하고 DTO로 변환하여 반환합니다. (N+1 문제 해결을 위해 Fetch Join 사용)
+     *
+     * @param pageable 페이징 정보
+     * @return 카드 응답 DTO의 페이지
+     */
+    @Transactional(readOnly = true)
     public Page<CardResponse> getAllCards(Pageable pageable) {
-        log.info("모든 카드 조회 요청: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
-        
-        Page<Card> cards = cardRepository.findAllByOrderByLikesCountDescCreatedAtDesc(pageable);
-        log.info("카드 조회 완료: totalElements={}, totalPages={}", cards.getTotalElements(), cards.getTotalPages());
-        
+        log.info("모든 카드 조회 요청 (Fetch Join): page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        Page<Card> cards = cardRepository.findAllWithCategory(pageable);
+        log.info("카드 조회 완료 (Fetch Join): totalElements={}, totalPages={}", cards.getTotalElements(), cards.getTotalPages());
         return cards.map(this::convertToResponse);
     }
 
-    public CardResponse getCardById(Long cardId) {
-        log.info("카드 상세 조회 요청: cardId={}", cardId);
+    /**
+     * 홈 페이지에 표시할 카드 목록을 조회합니다. (좋아요 정보 포함)
+     *
+     * @param pageable 페이징 정보
+     * @param userUuid 현재 사용자 UUID
+     * @return 카드 응답 DTO 리스트
+     */
+    @Transactional(readOnly = true)
+    public List<CardResponse> getCardsForHomePage(Pageable pageable, String userUuid) {
+        log.info("홈 페이지 카드 조회 요청: page={}, size={}, userUuid={}", 
+                pageable.getPageNumber(), pageable.getPageSize(), userUuid);
         
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> {
-                    log.warn("존재하지 않는 카드 조회 시도: cardId={}", cardId);
-                    return new CardNotFoundException(
-                        String.format("카드를 찾을 수 없습니다: ID %d", cardId)
-                    );
-                });
+        Page<Card> cards = cardRepository.findAllWithCategory(pageable);
+        log.info("홈 페이지 카드 조회 완료: totalElements={}, totalPages={}", 
+                cards.getTotalElements(), cards.getTotalPages());
+
+        List<Long> cardIds = cards.getContent().stream().map(Card::getId).collect(Collectors.toList());
         
-        log.info("카드 상세 조회 완료: id={}, title={}", card.getId(), card.getTitle());
+        // N+1 문제를 해결하기 위해 좋아요 정보를 한 번에 조회
+        Map<Long, List<CardLike>> likesByCardId = cardLikeRepository.findByCard_IdIn(cardIds).stream()
+                .collect(Collectors.groupingBy(like -> like.getCard().getId()));
+
+        return cards.getContent().stream()
+                .map(card -> {
+                    List<CardLike> likes = likesByCardId.getOrDefault(card.getId(), Collections.emptyList());
+                    long likesCount = likes.size();
+                    boolean isLiked = likes.stream().anyMatch(like -> like.getUuid().equals(userUuid));
+                    List<String> likedUuids = likes.stream().map(CardLike::getUuid).collect(Collectors.toList());
+                    return convertToResponse(card, likesCount, isLiked, likedUuids);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 특정 ID의 카드 정보를 조회하고 DTO로 변환하여 반환합니다.
+     *
+     * @param cardId 카드 ID
+     * @param userUuid 현재 사용자 UUID
+     * @return 카드 응답 DTO
+     * @throws CardNotFoundException 해당 ID의 카드가 존재하지 않을 경우
+     */
+    @Transactional(readOnly = true)
+    public CardResponse getCardById(Long cardId, String userUuid) {
+        log.info("카드 상세 조회 요청: cardId={}, userUuid={}", cardId, userUuid);
+        Card card = cardRepository.findByIdWithCategory(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
         
-        return convertToResponse(card);
+        List<CardLike> likes = cardLikeRepository.findByCard_Id(cardId);
+        long likesCount = likes.size();
+        boolean isLiked = likes.stream().anyMatch(like -> like.getUuid().equals(userUuid));
+        List<String> likedUuids = likes.stream().map(CardLike::getUuid).collect(Collectors.toList());
+        
+        log.info("카드 상세 조회 완료: id={}, title={}, likesCount={}", 
+                card.getId(), card.getTitle(), likesCount);
+        
+        return convertToResponse(card, likesCount, isLiked, likedUuids);
     }
 
     @Transactional
@@ -195,6 +246,12 @@ public class CardService {
         log.info("카드 삭제 완료: id={}, title={}", cardId, card.getTitle());
     }
 
+    /**
+     * 카드 엔티티를 전체 정보 DTO로 변환합니다. (좋아요 정보 포함)
+     *
+     * @param card 카드 엔티티
+     * @return 카드 응답 DTO
+     */
     private CardResponse convertToResponse(Card card) {
         CategoryResponse categoryResponse = CategoryResponse.builder()
                 .id(card.getCategory().getId())
@@ -220,5 +277,45 @@ public class CardService {
                 .likesCount(likesCount)
                 .likedUserUuids(likedUserUuids)
                 .build();
+    }
+
+    /**
+     * 카드 엔티티를 DTO로 변환합니다.
+     *
+     * @param card 카드 엔티티
+     * @param likesCount 좋아요 수
+     * @param isLiked 현재 사용자의 좋아요 여부
+     * @param likedUuids 좋아요한 사용자 UUID 목록
+     * @return 카드 응답 DTO
+     */
+    private CardResponse convertToResponse(Card card, long likesCount, boolean isLiked, List<String> likedUuids) {
+        CategoryResponse categoryResponse = new CategoryResponse(
+            card.getCategory().getId(),
+            card.getCategory().getName(),
+            card.getCategory().getIconUrl()
+        );
+
+        return CardResponse.builder()
+                .id(card.getId())
+                .uuid(card.getUuid())
+                .title(card.getTitle())
+                .category(categoryResponse)
+                .tags(card.getTags())
+                .situation(card.getSituation())
+                .usageExamples(card.getUsageExamples())
+                .content(card.getContent())
+                .createdAt(card.getCreatedAt())
+                .likesCount(likesCount)
+                .likedByUser(isLiked)
+                .likedUserUuids(likedUuids)
+                .build();
+    }
+
+    private Map<Long, Long> getLikesCountMap(List<Long> cardIds) {
+        if (cardIds == null || cardIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return cardLikeRepository.countLikesByCardIds(cardIds).stream()
+                .collect(Collectors.toMap(CardLikeCountDto::getCardId, CardLikeCountDto::getLikeCount));
     }
 } 

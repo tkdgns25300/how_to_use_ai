@@ -48,11 +48,13 @@ public class CardController {
     }
 
     @GetMapping("/{cardId}")
-    public ResponseEntity<ApiResponse<CardResponse>> getCardById(@PathVariable Long cardId) {
-        log.info("카드 상세 조회 API 호출: cardId={}", cardId);
+    public ResponseEntity<ApiResponse<CardResponse>> getCardById(
+            @PathVariable Long cardId,
+            @RequestParam(name = "uuid", required = false) String userUuid) {
+        log.info("카드 상세 조회 API 호출: cardId={}, userUuid={}", cardId, userUuid);
         
         try {
-            CardResponse cardResponse = cardService.getCardById(cardId);
+            CardResponse cardResponse = cardService.getCardById(cardId, userUuid);
             
             ApiResponse<CardResponse> response = ResponseHelper.success(
                 cardResponse,

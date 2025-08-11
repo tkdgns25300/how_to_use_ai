@@ -17,4 +17,11 @@ public class CategoryResponse {
     private String name;
     private String iconUrl;
     private LocalDateTime createdAt;
+
+    public CategoryResponse(Long id, String name, String iconUrl) {
+        this.id = id;
+        this.name = name;
+        this.iconUrl = iconUrl;
+        this.createdAt = null; // 이 생성자에서는 사용하지 않음
+    }
 } 

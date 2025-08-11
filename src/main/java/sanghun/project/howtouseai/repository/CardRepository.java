@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import sanghun.project.howtouseai.domain.Card;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
@@ -29,4 +30,10 @@ public interface CardRepository extends JpaRepository<Card, Long> {
            "(SELECT COUNT(cl) FROM CardLike cl WHERE cl.card.id = c.id) DESC, " +
            "c.createdAt DESC")
     Page<Card> findAllByOrderByLikesCountDescCreatedAtDesc(Pageable pageable);
+
+    @Query("SELECT c FROM Card c JOIN FETCH c.category")
+    Page<Card> findAllWithCategory(Pageable pageable);
+    
+    @Query("SELECT c FROM Card c JOIN FETCH c.category WHERE c.id = :id")
+    Optional<Card> findByIdWithCategory(@Param("id") Long id);
 } 
