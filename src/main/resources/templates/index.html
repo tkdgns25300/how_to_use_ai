@@ -4,23 +4,50 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AI Usage Guide</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
         <link rel="stylesheet" th:href="@{/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/css/form.css}" />
     </head>
     <body>
         <!-- 헤더 섹션 -->
         <header class="header">
             <div class="container">
-                <h1 class="main-title">AI Usage Guide</h1>
-                <p class="subtitle">Share tips and tricks for using AI tools effectively</p>
+                <div class="logo">
+                    <a href="/">
+                        <h1>AI Guide</h1>
+                    </a>
+                </div>
                 <div class="cta-buttons">
                     <a href="/card/new" class="btn btn-primary">Share Tip</a>
                 </div>
             </div>
         </header>
 
+        <!-- Hero 섹션 -->
+        <section class="hero-section">
+            <div class="container">
+                <h2 class="hero-title">Work and Live Smarter with AI!</h2>
+                <p class="hero-subtitle">
+                    Explore AI usage in a fun and easy way. We provide guides that even beginners can follow right away.
+                </p>
+                <div class="hero-info-box">
+                    <span>🚀 10+ Verified AI Guides Available</span>
+                </div>
+            </div>
+        </section>
+
         <!-- 카드 그리드 섹션 -->
         <main class="main">
             <div class="container">
+                <div class="section-header">
+                    <h3 class="section-title">🔥 Popular & Recommended Guides</h3>
+                </div>
+
                 <div class="cards-grid">
                     <!-- 카드가 없을 때 메시지 -->
                     <div th:if="${#lists.isEmpty(cards)}" class="no-cards">
@@ -29,44 +56,65 @@
                     </div>
 
                     <!-- 카드 데이터로 동적 렌더링 -->
-                    <div th:each="card : ${cards}" class="card clickable-card" th:data-card-id="${card.id}">
+                    <div th:each="card : ${cards}" class="card">
                         <div class="card-header">
-                            <div class="category-icon" th:if="${card.category != null}">
-                                <img
-                                    th:if="${card.category.iconUrl != null}"
-                                    th:src="${card.category.iconUrl}"
-                                    th:alt="${card.category.name}"
-                                    class="category-icon-img"
-                                />
-                                <span th:unless="${card.category.iconUrl != null}">🤖</span>
+                            <div class="card-title-group">
+                                <div
+                                    class="category-icon"
+                                    th:if="${card.category != null and card.category.iconUrl != null}"
+                                >
+                                    <img
+                                        th:src="${card.category.iconUrl}"
+                                        th:alt="${card.category.name}"
+                                        class="category-icon-img"
+                                    />
+                                </div>
+                                <div
+                                    class="category-icon"
+                                    th:if="${card.category == null or card.category.iconUrl == null}"
+                                >
+                                    <span>🤖</span>
+                                </div>
+                                <h4 class="card-title" th:text="${card.title}">Card Title</h4>
                             </div>
-                            <div class="category-icon" th:unless="${card.category != null}">🤖</div>
-                            <h3 class="card-title" th:text="${card.title}">Card Title</h3>
+                            <div class="like-count-wrapper">
+                                <span class="heart-icon">❤️</span>
+                                <span class="like-count" th:text="${card.likesCount}">0</span>
+                            </div>
+                        </div>
+                        <div
+                            class="category-tag"
+                            th:if="${card.category != null}"
+                            th:classappend="'category-' + ${#strings.toLowerCase(#strings.replace(card.category.name, ' ', '_'))}"
+                        >
+                            <span th:text="${card.category.name}">Category</span>
                         </div>
                         <div class="card-body">
-                            <p class="card-description" th:text="${card.content}">Card Description</p>
-                            <div class="card-tags" th:if="${card.tags != null and #strings.length(card.tags) > 0}">
+                            <p class="card-description" th:text="${card.content}">
+                                Card Description goes here. This is a brief summary of how to use the AI tool
+                                effectively.
+                            </p>
+                        </div>
+
+                        <div class="card-tags" th:if="${card.tags != null and #strings.length(card.tags) > 0}">
+                            <th:block th:with="tagList=${#strings.arraySplit(card.tags, ',')}">
                                 <span
-                                    th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
+                                    th:each="tag, iterStat : ${tagList}"
+                                    th:if="${iterStat.index < 3}"
                                     class="tag"
                                     th:text="${'#' + tag.trim()}"
-                                    >#tag</span
-                                >
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <button
-                                class="like-button"
-                                th:data-card-id="${card.id}"
-                                th:data-uuid="${session.uuid != null ? session.uuid : ''}"
-                                th:data-liked-uuids="${card.likedUserUuids != null ? #strings.arrayJoin(card.likedUserUuids, ',') : ''}"
-                            >
-                                <span class="heart-icon">
-                                    <span>♡</span>
+                                ></span>
+                                <span th:if="${#lists.size(tagList) > 3}" class="tag tag-more">
+                                    +<span th:text="${#lists.size(tagList) - 3}"></span>
                                 </span>
-                                <span class="like-count" th:text="${card.likesCount}">0</span>
-                            </button>
+                            </th:block>
                         </div>
+
+                        <!-- 사용 방법 보기 버튼 -->
+                        <a th:href="@{/card/{id}(id=${card.id})}" class="btn btn-view-guide">
+                            <span>View Guide</span>
+                            <span>→</span>
+                        </a>
                     </div>
                 </div>
             </div>
