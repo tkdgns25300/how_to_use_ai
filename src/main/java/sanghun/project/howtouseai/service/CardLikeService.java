@@ -13,6 +13,7 @@ import sanghun.project.howtouseai.repository.CardLikeRepository;
 import sanghun.project.howtouseai.repository.CardRepository;
 import sanghun.project.howtouseai.dto.LikeResponse;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -36,34 +37,40 @@ public class CardLikeService {
     public LikeResponse toggleLike(Long cardId, String uuid) {
         log.info("좋아요 토글 요청: cardId={}, uuid={}", cardId, uuid);
 
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> {
-                    log.warn("존재하지 않는 카드에 좋아요 토글 시도: cardId={}", cardId);
-                    return new CardNotFoundException("Card not found with id: " + cardId);
-                });
+        if (!cardRepository.existsById(cardId)) {
+            log.warn("존재하지 않는 카드에 좋아요 토글 시도: cardId={}", cardId);
+            throw new CardNotFoundException("Card not found with id: " + cardId);
+        }
 
-        Optional<CardLike> existingLike = cardLikeRepository.findByCardIdAndUuid(cardId, uuid);
+        List<CardLike> likes = cardLikeRepository.findByCard_Id(cardId);
+        Optional<CardLike> userLike = likes.stream()
+                                           .filter(like -> like.getUuid().equals(uuid))
+                                           .findFirst();
 
         boolean isLiked;
-        if (existingLike.isPresent()) {
+        long newLikesCount;
+
+        if (userLike.isPresent()) {
             // 이미 좋아요 상태 -> 좋아요 취소
-            cardLikeRepository.delete(existingLike.get());
+            cardLikeRepository.delete(userLike.get());
             isLiked = false;
+            newLikesCount = likes.size() - 1;
             log.info("좋아요 취소 완료: cardId={}, uuid={}", cardId, uuid);
         } else {
             // 좋아요 아닌 상태 -> 좋아요 추가
+            Card card = Card.builder().id(cardId).build(); // 프록시 객체 사용
             CardLike newLike = CardLike.builder().card(card).uuid(uuid).build();
             cardLikeRepository.save(newLike);
             isLiked = true;
+            newLikesCount = likes.size() + 1;
             log.info("좋아요 추가 완료: cardId={}, uuid={}", cardId, uuid);
         }
 
-        long likesCount = cardLikeRepository.countByCardId(cardId);
-        log.info("좋아요 토글 후, 카드 ID {}의 총 좋아요 수: {}", cardId, likesCount);
+        log.info("좋아요 토글 후, 카드 ID {}의 총 좋아요 수: {}", cardId, newLikesCount);
 
         return LikeResponse.builder()
                 .liked(isLiked)
-                .likesCount(likesCount)
+                .likesCount(newLikesCount)
                 .build();
     }
 } 

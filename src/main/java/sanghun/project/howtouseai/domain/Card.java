@@ -44,8 +44,9 @@ public class Card {
     private LocalDateTime createdAt;
 
     @Builder
-    public Card(String uuid, String title, Category category, String tags, String situation, 
+    public Card(Long id, String uuid, String title, Category category, String tags, String situation, 
                 String usageExamples, String content) {
+        this.id = id;
         this.uuid = uuid;
         this.title = title;
         this.category = category;
