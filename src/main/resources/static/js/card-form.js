@@ -75,12 +75,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log("Response result:", result); // 디버깅용 로그
 
                 if (result.success) {
-                    showSuccessMessage("Tip shared successfully!");
+                    // 성공 알람 표시
+                    notification.success("Tip Shared!", "Your AI usage tip has been successfully shared.", 3000);
+
+                    // 잠시 후 홈으로 이동
                     setTimeout(() => {
                         window.location.href = "/";
-                    }, 2000);
+                    }, 1500);
                 } else {
-                    showErrorMessage(result.message || "Failed to share tip.");
+                    // 실패 알람 표시
+                    notification.error(
+                        "Share Failed",
+                        result.message || "Failed to share the tip. Please try again.",
+                        5000
+                    );
                 }
             } else {
                 let errorMessage = `Server error: ${response.status}`;
@@ -95,11 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     const errorText = await response.text();
                     errorMessage = `Server error: ${response.status} - ${errorText}`;
                 }
-                showErrorMessage(errorMessage);
+                // 에러 알람 표시
+                notification.error("Server Error", errorMessage, 5000);
             }
         } catch (error) {
             console.error("Submit error:", error);
-            showErrorMessage("Network error occurred. Please try again.");
+            // 에러 알람 표시
+            notification.error("Network Error", "Network error occurred. Please try again.", 5000);
         } finally {
             setLoadingState(false);
         }
@@ -116,31 +126,31 @@ document.addEventListener("DOMContentLoaded", function () {
         const usageExamples = form.querySelector("#usageExamples").value.trim();
 
         if (!title) {
-            showErrorMessage("Please enter a usage tip title.");
+            notification.error("Validation Error", "Please enter a usage tip title.", 4000);
             form.querySelector("#title").focus();
             return false;
         }
 
         if (!categoryId) {
-            showErrorMessage("Please select an AI tool category.");
+            notification.error("Validation Error", "Please select an AI tool category.", 4000);
             form.querySelector("#categoryId").focus();
             return false;
         }
 
         if (!content) {
-            showErrorMessage("Please enter a usage tip description.");
+            notification.error("Validation Error", "Please enter a usage tip description.", 4000);
             form.querySelector("#content").focus();
             return false;
         }
 
         if (!situation) {
-            showErrorMessage("Please explain when to use this tip.");
+            notification.error("Validation Error", "Please explain when to use this tip.", 4000);
             form.querySelector("#situation").focus();
             return false;
         }
 
         if (!usageExamples) {
-            showErrorMessage("Please provide specific usage examples.");
+            notification.error("Validation Error", "Please provide specific usage examples.", 4000);
             form.querySelector("#usageExamples").focus();
             return false;
         }
@@ -161,52 +171,6 @@ document.addEventListener("DOMContentLoaded", function () {
             submitBtn.textContent = "Share Tip";
             submitBtn.disabled = false;
         }
-    }
-
-    // 성공 메시지 표시
-    function showSuccessMessage(message) {
-        showMessage(message, "success");
-    }
-
-    // 에러 메시지 표시
-    function showErrorMessage(message) {
-        showMessage(message, "error");
-    }
-
-    // 메시지 표시 함수
-    function showMessage(message, type) {
-        // 기존 메시지 제거
-        const existingMessage = document.querySelector(".message");
-        if (existingMessage) {
-            existingMessage.remove();
-        }
-
-        // 새 메시지 생성
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `message message-${type}`;
-        messageDiv.textContent = message;
-
-        // 스타일 적용
-        messageDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
-        `;
-
-        document.body.appendChild(messageDiv);
-
-        // 3초 후 자동 제거
-        setTimeout(() => {
-            messageDiv.style.animation = "slideOut 0.3s ease";
-            setTimeout(() => messageDiv.remove(), 300);
-        }, 3000);
     }
 
     // UUID 생성 함수

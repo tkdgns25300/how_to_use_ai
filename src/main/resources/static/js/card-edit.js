@@ -45,16 +45,29 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (result.success) {
-                showSuccessMessage("Tip updated successfully!");
+                // 성공 알람 표시
+                notification.success("Tip Updated!", "Your AI usage tip has been successfully updated.", 3000);
+
+                // 잠시 후 상세 페이지로 이동
                 setTimeout(() => {
                     window.location.href = `/card/${cardId}`;
-                }, 2000);
+                }, 1500);
             } else {
-                showErrorMessage(result.message || "Failed to update tip.");
+                // 실패 알람 표시
+                notification.error(
+                    "Update Failed",
+                    result.message || "Failed to update the tip. Please try again.",
+                    5000
+                );
             }
         } catch (error) {
             console.error("Update error:", error);
-            showErrorMessage("Server error occurred. Please try again.");
+            // 에러 알람 표시
+            notification.error(
+                "Network Error",
+                "An error occurred while updating the tip. Please check your connection.",
+                5000
+            );
         } finally {
             setLoadingState(false);
         }
@@ -67,19 +80,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const content = form.querySelector("#content").value.trim();
 
         if (!title) {
-            showErrorMessage("Please enter a usage tip title.");
+            notification.error("Validation Error", "Please enter a usage tip title.", 4000);
             form.querySelector("#title").focus();
             return false;
         }
 
         if (!categoryId) {
-            showErrorMessage("Please select an AI tool category.");
+            notification.error("Validation Error", "Please select an AI tool category.", 4000);
             form.querySelector("#categoryId").focus();
             return false;
         }
 
         if (!content) {
-            showErrorMessage("Please enter a usage tip description.");
+            notification.error("Validation Error", "Please enter a usage tip description.", 4000);
             form.querySelector("#content").focus();
             return false;
         }
@@ -98,52 +111,6 @@ document.addEventListener("DOMContentLoaded", function () {
             submitBtn.textContent = "Update Tip";
             submitBtn.disabled = false;
         }
-    }
-
-    // 성공 메시지 표시
-    function showSuccessMessage(message) {
-        showMessage(message, "success");
-    }
-
-    // 에러 메시지 표시
-    function showErrorMessage(message) {
-        showMessage(message, "error");
-    }
-
-    // 메시지 표시 함수
-    function showMessage(message, type) {
-        // 기존 메시지 제거
-        const existingMessage = document.querySelector(".message");
-        if (existingMessage) {
-            existingMessage.remove();
-        }
-
-        // 새 메시지 생성
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `message message-${type}`;
-        messageDiv.textContent = message;
-
-        // 스타일 적용
-        messageDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
-        `;
-
-        document.body.appendChild(messageDiv);
-
-        // 3초 후 자동 제거
-        setTimeout(() => {
-            messageDiv.style.animation = "slideOut 0.3s ease";
-            setTimeout(() => messageDiv.remove(), 300);
-        }, 3000);
     }
 
     // UUID 생성 함수
@@ -182,58 +149,31 @@ async function deleteCard() {
         const result = await response.json();
 
         if (result.success) {
-            showDeleteMessage("Tip deleted successfully!");
+            // 성공 알람 표시
+            notification.success("Tip Deleted!", "Your AI usage tip has been successfully deleted.", 3000);
+
+            // 잠시 후 홈으로 이동
             setTimeout(() => {
                 window.location.href = "/";
-            }, 2000);
+            }, 1500);
         } else {
-            showDeleteMessage(result.message || "Failed to delete tip.", "error");
+            // 실패 알람 표시
+            notification.error("Delete Failed", result.message || "Failed to delete the tip. Please try again.", 5000);
         }
     } catch (error) {
         console.error("Delete error:", error);
-        showDeleteMessage("Server error occurred. Please try again.", "error");
+        // 에러 알람 표시
+        notification.error(
+            "Network Error",
+            "An error occurred while deleting the tip. Please check your connection.",
+            5000
+        );
     }
-}
-
-function showDeleteMessage(message, type = "success") {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = `message message-${type}`;
-    messageDiv.textContent = message;
-
-    messageDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-        ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
-    `;
-
-    document.body.appendChild(messageDiv);
-
-    setTimeout(() => {
-        messageDiv.style.animation = "slideOut 0.3s ease";
-        setTimeout(() => messageDiv.remove(), 300);
-    }, 3000);
 }
 
 // 애니메이션 CSS 추가
 const style = document.createElement("style");
 style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
     .btn-danger {
         background-color: #dc3545;
         color: white;

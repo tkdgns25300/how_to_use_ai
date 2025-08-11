@@ -96,7 +96,6 @@ function initializeEditDeleteButtons() {
 function handleDeleteClick() {
     const deleteButton = document.querySelector(".btn-delete");
     const cardId = deleteButton.getAttribute("data-card-id");
-
     if (confirm("Are you sure you want to delete this tip?")) {
         deleteCard(cardId);
     }
@@ -105,6 +104,12 @@ function handleDeleteClick() {
 // 카드 삭제 기능
 async function deleteCard(cardId) {
     try {
+        // 로딩 상태 표시
+        const deleteButton = document.querySelector(".btn-delete");
+        const originalText = deleteButton.textContent;
+        deleteButton.disabled = true;
+        deleteButton.textContent = "Deleting...";
+
         const response = await fetch(`/api/cards/${cardId}`, {
             method: "DELETE",
             headers: {
@@ -116,18 +121,39 @@ async function deleteCard(cardId) {
         if (response.ok) {
             const result = await response.json();
             if (result.success) {
-                alert("Tip deleted successfully!");
-                window.location.href = "/";
+                // 성공 알람 표시
+                notification.success("Tip Deleted!", "Your AI usage tip has been successfully deleted.", 3000);
+
+                // 잠시 후 홈으로 이동
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1500);
             } else {
-                alert("Failed to delete tip: " + (result.message || "Unknown error"));
+                // 실패 알람 표시
+                notification.error(
+                    "Delete Failed",
+                    result.message || "Failed to delete the tip. Please try again.",
+                    5000
+                );
             }
         } else {
             const errorData = await response.json();
-            alert("Failed to delete tip: " + (errorData.message || "Server error"));
+            // 에러 알람 표시
+            notification.error("Delete Failed", errorData.message || "Server error occurred. Please try again.", 5000);
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while deleting the tip.");
+        // 에러 알람 표시
+        notification.error(
+            "Network Error",
+            "An error occurred while deleting the tip. Please check your connection.",
+            5000
+        );
+    } finally {
+        // 버튼 상태 복원
+        const deleteButton = document.querySelector(".btn-delete");
+        deleteButton.disabled = false;
+        deleteButton.textContent = "Delete Tip";
     }
 }
 
