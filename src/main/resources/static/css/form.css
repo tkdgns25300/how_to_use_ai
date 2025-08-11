@@ -1,4 +1,4 @@
-/* 폼 컨테이너 */
+/* 폼 페이지 공통 스타일 */
 .form-container {
     max-width: 800px;
     margin: 0 auto;
@@ -6,23 +6,23 @@
 }
 
 .card-form {
-    background-color: white;
-    border-radius: 12px;
+    background: white;
     padding: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
 }
 
-/* 폼 그룹 */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
-    font-size: 0.95rem;
+    color: var(--text-color);
+    font-size: 1rem;
 }
 
 .form-group input,
@@ -30,133 +30,180 @@
 .form-group textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e1e5e9;
-    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
+    background: white;
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.1);
 }
 
 .form-group textarea {
-    min-height: 100px;
+    min-height: 120px;
     resize: vertical;
 }
 
-.form-group textarea[name="description"] {
-    min-height: 80px;
-}
-
-.form-group textarea[name="content"] {
-    min-height: 120px;
-}
-
-/* 필수 필드 표시 */
-.form-group label[for*="title"]::after,
-.form-group label[for*="categoryId"]::after,
-.form-group label[for*="description"]::after {
-    content: " *";
-    color: #e53e3e;
-}
-
-/* 폼 액션 */
 .form-actions {
     display: flex;
     gap: 15px;
-    justify-content: flex-end;
+    justify-content: flex-start;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #e1e5e9;
+    border-top: 2px solid #f0f0f0;
 }
 
-.form-actions .btn {
-    min-width: 120px;
+/* 수정 페이지 블록 레이아웃 */
+.edit-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 30px;
+    margin-top: 30px;
 }
 
-/* 위험 버튼 스타일 */
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border: 2px solid #dc3545;
+.edit-block {
+    background: white;
+    border: 3px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+    padding: 25px;
+    transition: all 0.2s ease;
 }
 
-.btn-danger:hover {
-    background-color: #c82333;
-    border-color: #c82333;
+.edit-block:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
 }
 
-/* 플레이스홀더 스타일 */
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-    color: #999;
-    font-style: italic;
+.block-large {
+    grid-column: 1;
+    grid-row: 1;
 }
 
-/* 유효성 검사 스타일 */
-.form-group input:invalid,
-.form-group select:invalid,
-.form-group textarea:invalid {
-    border-color: #e53e3e;
+.block-small {
+    grid-column: 2;
+    grid-row: 1;
 }
 
-.form-group input:invalid:focus,
-.form-group select:invalid:focus,
-.form-group textarea:invalid:focus {
-    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+.block-full {
+    grid-column: 1 / -1;
+    grid-row: 2;
 }
 
-/* 로딩 상태 */
-.form-loading {
-    opacity: 0.6;
-    pointer-events: none;
+.block-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
 }
 
-.form-loading .btn {
-    position: relative;
+.block-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
 }
 
-.form-loading .btn::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 16px;
-    height: 16px;
-    margin: -8px 0 0 -8px;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.block-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-color);
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.block-content {
+    line-height: 1.6;
+}
+
+/* 헤더 스타일 */
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-back {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.edit-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.edit-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.edit-title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-    .form-container {
-        padding: 10px;
+    .edit-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
-    
-    .card-form {
-        padding: 20px;
+
+    .block-large,
+    .block-small,
+    .block-full {
+        grid-column: 1;
     }
-    
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .edit-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .form-actions .btn {
         width: 100%;
     }
-} 
+}

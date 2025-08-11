@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title th:text="'Edit ' + ${card.title} + ' - AI Usage Guide'">Edit Card - AI Usage Guide</title>
+        <title>Edit AI Usage Tip - AI Usage Guide</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
         <link rel="stylesheet" th:href="@{/css/form.css}" />
     </head>
@@ -11,10 +11,12 @@
         <!-- 헤더 섹션 -->
         <header class="header">
             <div class="container">
-                <h1 class="main-title">Edit AI Usage Tip</h1>
-                <p class="subtitle">Update your AI usage tip</p>
-                <div class="cta-buttons">
-                    <a th:href="@{/card/{cardId}(cardId=${card.id})}" class="btn btn-secondary">Back to Detail</a>
+                <div class="header-content">
+                    <a th:href="@{/card/{cardId}(cardId=${card.id})}" class="btn btn-back">←</a>
+                    <div class="edit-info">
+                        <div class="edit-icon">✏️</div>
+                        <h1 class="edit-title">Edit AI Usage Tip</h1>
+                    </div>
                 </div>
             </div>
         </header>
@@ -22,49 +24,63 @@
         <!-- 카드 수정 폼 -->
         <main class="main">
             <div class="container">
-                <div class="form-container">
-                    <form id="cardForm" class="card-form">
-                        <input type="hidden" id="cardId" th:value="${card.id}" />
-
-                        <div class="form-group">
-                            <label for="title">Usage Tip Title *</label>
-                            <input
-                                type="text"
-                                id="title"
-                                name="title"
-                                required
-                                maxlength="20"
-                                th:value="${card.title}"
-                                placeholder="e.g., Write emails with ChatGPT, Design logos with Midjourney"
-                            />
+                <div class="edit-grid">
+                    <!-- 좌측: 기본 정보 -->
+                    <div class="edit-block block-large">
+                        <div class="block-header">
+                            <span class="block-icon">📝</span>
+                            <h2>Basic Information</h2>
                         </div>
+                        <form id="cardForm" class="card-form">
+                            <input type="hidden" id="cardId" th:value="${card.id}" />
 
-                        <div class="form-group">
-                            <label for="categoryId">AI Tool Category *</label>
-                            <select id="categoryId" name="categoryId" required>
-                                <option value="">Select AI tool category</option>
-                                <option
-                                    th:each="category : ${categories}"
-                                    th:value="${category.id}"
-                                    th:text="${category.name}"
-                                    th:selected="${category.id == card.category.id}"
-                                >
-                                    Category Name
-                                </option>
-                            </select>
+                            <div class="form-group">
+                                <label for="title">Usage Tip Title *</label>
+                                <input
+                                    type="text"
+                                    id="title"
+                                    name="title"
+                                    required
+                                    maxlength="20"
+                                    th:value="${card.title}"
+                                    placeholder="e.g., Write emails with ChatGPT"
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="categoryId">AI Tool Category *</label>
+                                <select id="categoryId" name="categoryId" required>
+                                    <option value="">Select AI tool category</option>
+                                    <option
+                                        th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"
+                                        th:selected="${category.id == card.category.id}"
+                                    >
+                                        Category Name
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="content">Usage Tip Description *</label>
+                                <textarea
+                                    id="content"
+                                    name="content"
+                                    required
+                                    placeholder="Explain how to use this AI tool effectively"
+                                    th:text="${card.content}"
+                                ></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 우측: 추가 정보 -->
+                    <div class="edit-block block-small">
+                        <div class="block-header">
+                            <span class="block-icon">🔍</span>
+                            <h2>Additional Information</h2>
                         </div>
-
-                        <div class="form-group">
-                            <label for="content">Usage Tip Description *</label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                required
-                                placeholder="Explain how to use this AI tool effectively"
-                                th:text="${card.content}"
-                            ></textarea>
-                        </div>
-
                         <div class="form-group">
                             <label for="tags">Related Tags (comma separated)</label>
                             <input
@@ -95,13 +111,18 @@
                                 th:text="${card.usageExamples}"
                             ></textarea>
                         </div>
+                    </div>
 
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Update Tip</button>
-                            <button type="button" class="btn btn-danger" onclick="deleteCard()">Delete Tip</button>
-                            <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                    <!-- 하단: 액션 버튼 -->
+                    <div class="edit-block block-full">
+                        <div class="block-content">
+                            <div class="form-actions">
+                                <button type="submit" form="cardForm" class="btn btn-primary">Update Tip</button>
+                                <button type="button" class="btn btn-danger" onclick="deleteCard()">Delete Tip</button>
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </main>

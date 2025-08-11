@@ -1,186 +1,193 @@
 // 카드 상세 페이지 JavaScript
 document.addEventListener("DOMContentLoaded", function () {
-    const likeButton = document.querySelector(".like-button");
-    const editButton = document.querySelector(".edit-btn");
-
-    // UUID 생성 또는 가져오기 (LocalStorage 사용)
-    let uuid = localStorage.getItem("userUuid");
-    if (!uuid) {
-        uuid = generateUUID();
-        localStorage.setItem("userUuid", uuid);
-    }
-
-    // 권한 확인 및 Edit 버튼 표시/숨김
-    if (editButton) {
-        const cardUuid = editButton.getAttribute("data-card-uuid");
-        console.log("Current user UUID:", uuid);
-        console.log("Card author UUID:", cardUuid);
-
-        if (uuid === cardUuid) {
-            editButton.style.display = "inline-block";
-            console.log("Edit button shown - user is author");
-        } else {
-            editButton.style.display = "none";
-            console.log("Edit button hidden - user is not author");
-        }
-    }
-
-    // 좋아요 상태 초기화
-    initializeLikeState();
-
-    // 좋아요 버튼 이벤트
-    if (likeButton) {
-        likeButton.addEventListener("click", async function () {
-            const cardId = this.getAttribute("data-card-id");
-            const isLiked = this.classList.contains("liked");
-
-            try {
-                const url = isLiked ? `/api/cards/${cardId}/like?uuid=${uuid}` : `/api/cards/${cardId}/like`;
-                const method = isLiked ? "DELETE" : "POST";
-                const body = isLiked ? null : JSON.stringify({ uuid: uuid });
-
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: body,
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // 좋아요 상태 토글
-                    toggleLikeState(!isLiked);
-                    showMessage(isLiked ? "Like removed!" : "Tip liked successfully!", "success");
-                } else {
-                    showMessage(result.message || "Failed to update like.", "error");
-                }
-            } catch (error) {
-                console.error("Like error:", error);
-                showMessage("Server error occurred. Please try again.", "error");
-            }
-        });
-    }
-
-    // 좋아요 상태 초기화
-    function initializeLikeState() {
-        if (!likeButton) return;
-
-        const cardId = likeButton.getAttribute("data-card-id");
-        const likedUserUuidsStr = likeButton.getAttribute("data-liked-uuids") || "[]";
-        let likedUserUuids = [];
-
-        try {
-            if (likedUserUuidsStr && likedUserUuidsStr.trim() !== "") {
-                likedUserUuids = likedUserUuidsStr.split(",").filter((uuid) => uuid.trim() !== "");
-            }
-        } catch (error) {
-            console.error("Error parsing liked UUIDs:", error);
-            likedUserUuids = [];
-        }
-
-        // 현재 사용자가 좋아요를 눌렀는지 확인
-        const isLiked = likedUserUuids.includes(uuid);
-        updateLikeUI(isLiked);
-
-        console.log("Like state initialized:", {
-            cardId: cardId,
-            userUuid: uuid,
-            likedUserUuids: likedUserUuids,
-            isLiked: isLiked,
-        });
-    }
-
-    // 좋아요 상태 토글
-    function toggleLikeState(isLiked) {
-        updateLikeUI(isLiked);
-
-        // 좋아요 수 업데이트
-        const likeCountElement = document.querySelector(".like-count");
-        if (likeCountElement) {
-            const currentCount = parseInt(likeCountElement.textContent);
-            const newCount = isLiked ? currentCount + 1 : currentCount - 1;
-            likeCountElement.textContent = newCount + " likes";
-        }
-    }
-
-    // 좋아요 UI 업데이트
-    function updateLikeUI(liked) {
-        const heartIcon = likeButton.querySelector(".heart-icon span");
-        const likeText = likeButton.querySelector(".like-text");
-
-        if (liked) {
-            heartIcon.textContent = "♥";
-            heartIcon.style.color = "#e74c3c";
-            likeButton.classList.add("liked");
-            if (likeText) likeText.textContent = "Liked";
-        } else {
-            heartIcon.textContent = "♡";
-            heartIcon.style.color = "#666";
-            likeButton.classList.remove("liked");
-            if (likeText) likeText.textContent = "Like this tip";
-        }
-    }
-
-    // 메시지 표시 함수
-    function showMessage(message, type) {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `message message-${type}`;
-        messageDiv.textContent = message;
-
-        messageDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
-        `;
-
-        document.body.appendChild(messageDiv);
-
-        setTimeout(() => {
-            messageDiv.style.animation = "slideOut 0.3s ease";
-            setTimeout(() => messageDiv.remove(), 300);
-        }, 3000);
-    }
-
-    // UUID 생성 함수
-    function generateUUID() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
-    }
+    initializeLikeButtons();
+    initializeEditDeleteButtons();
 });
 
-// 애니메이션 CSS 추가
-const style = document.createElement("style");
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+// 좋아요 버튼 초기화
+function initializeLikeButtons() {
+    const likeButtons = document.querySelectorAll(".btn-like");
+    likeButtons.forEach((button) => {
+        const cardId = button.getAttribute("data-card-id");
+        const uuid = button.getAttribute("data-uuid");
+        const likedUuids = button.getAttribute("data-liked-uuids");
+
+        if (uuid && likedUuids) {
+            const uuidList = likedUuids.split(",").filter((u) => u.trim() !== "");
+            if (uuidList.includes(uuid)) {
+                button.classList.add("liked");
+                button.querySelector(".like-text").textContent = "Liked";
+            }
+        }
+
+        button.addEventListener("click", () => handleLikeClick(button, cardId));
+    });
+}
+
+// 좋아요 클릭 처리
+async function handleLikeClick(button, cardId) {
+    const uuid = getUuid();
+    if (!uuid) {
+        alert("Please refresh the page to like this tip.");
+        return;
     }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
+
+    try {
+        const response = await fetch(`/api/cards/${cardId}/like`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uuid: uuid }),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                toggleLikeState(button);
+                updateLikeCount(button, result.data.liked);
+            }
+        } else {
+            console.error("Failed to like/unlike");
+        }
+    } catch (error) {
+        console.error("Error:", error);
     }
-    
-    .like-button.liked {
-        background-color: #e74c3c !important;
-        border-color: #e74c3c !important;
-        color: white !important;
+}
+
+// 좋아요 상태 토글
+function toggleLikeState(button) {
+    const isLiked = button.classList.contains("liked");
+    if (isLiked) {
+        button.classList.remove("liked");
+        button.querySelector(".like-text").textContent = "Like";
+    } else {
+        button.classList.add("liked");
+        button.querySelector(".like-text").textContent = "Liked";
     }
-    
-    .like-button.liked .like-text {
-        color: white !important;
+}
+
+// 좋아요 수 업데이트
+function updateLikeCount(button, liked) {
+    // 좋아요 수는 서버에서 업데이트되므로 페이지 새로고침이 필요할 수 있습니다
+    // 실제 구현에서는 서버 응답에서 좋아요 수를 받아와서 업데이트
+}
+
+// 수정/삭제 버튼 초기화
+function initializeEditDeleteButtons() {
+    const editButton = document.querySelector(".btn-edit");
+    const deleteButton = document.querySelector(".btn-delete");
+
+    if (editButton && deleteButton) {
+        const cardUuid = editButton.getAttribute("data-card-uuid");
+        const userUuid = getUuid();
+
+        if (userUuid && cardUuid === userUuid) {
+            editButton.style.display = "inline-block";
+            deleteButton.style.display = "inline-block";
+        }
     }
-`;
-document.head.appendChild(style);
+}
+
+// UUID 가져오기
+function getUuid() {
+    let uuid = localStorage.getItem("userUuid");
+    if (!uuid) {
+        uuid = "uuid-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem("userUuid", uuid);
+    }
+    return uuid;
+}
+
+// URL 복사 기능
+function copyUrl() {
+    const currentUrl = window.location.href;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        // Modern clipboard API 사용
+        navigator.clipboard
+            .writeText(currentUrl)
+            .then(() => {
+                showCopyMessage("URL copied to clipboard!");
+            })
+            .catch(() => {
+                fallbackCopyTextToClipboard(currentUrl);
+            });
+    } else {
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(currentUrl);
+    }
+}
+
+// Fallback 복사 방법
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        document.execCommand("copy");
+        showCopyMessage("URL copied to clipboard!");
+    } catch (err) {
+        console.error("Fallback: Oops, unable to copy", err);
+        showCopyMessage("Failed to copy URL");
+    }
+
+    document.body.removeChild(textArea);
+}
+
+// 복사 메시지 표시
+function showCopyMessage(message) {
+    const messageDiv = document.createElement("div");
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-size: 14px;
+    `;
+
+    document.body.appendChild(messageDiv);
+
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 2000);
+}
+
+// 카드 삭제 기능
+function deleteCard() {
+    if (confirm("Are you sure you want to delete this tip?")) {
+        const cardId = document.getElementById("cardId").value;
+        const uuid = getUuid();
+
+        fetch(`/api/cards/${cardId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uuid: uuid }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Tip deleted successfully!");
+                    window.location.href = "/";
+                } else {
+                    alert("Failed to delete tip.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while deleting the tip.");
+            });
+    }
+}

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title th:text="${card.title + ' - AI Usage Guide'}">Card Detail - AI Usage Guide</title>
+        <title th:text="${card.title} + ' - AI Usage Guide'">AI Usage Guide</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
         <link rel="stylesheet" th:href="@{/css/detail.css}" />
     </head>
@@ -12,110 +12,114 @@
         <header class="header">
             <div class="container">
                 <div class="header-content">
-                    <div class="back-button">
-                        <a href="/" class="btn btn-secondary">← Back to Home</a>
+                    <a href="/" class="btn btn-back">←</a>
+                    <div class="tool-info">
+                        <div class="category-badge" th:if="${card.category != null}">
+                            <span th:text="${card.category.name}">Category</span>
+                        </div>
+                        <div class="tool-icon">✏️</div>
+                        <h1 class="tool-title" th:text="${card.title}">Tool Title</h1>
                     </div>
-                    <h1 class="main-title">AI Usage Tip Detail</h1>
                 </div>
             </div>
         </header>
 
-        <!-- 카드 상세 내용 -->
+        <!-- 메인 콘텐츠 -->
         <main class="main">
             <div class="container">
-                <div class="card-detail">
-                    <!-- 카드 헤더 -->
-                    <div class="card-header">
-                        <div class="category-info">
-                            <div class="category-icon" th:if="${card.category != null}">
-                                <img
-                                    th:if="${card.category.iconUrl != null}"
-                                    th:src="${card.category.iconUrl}"
-                                    th:alt="${card.category.name}"
-                                    class="category-icon-img"
-                                />
-                                <span th:unless="${card.category.iconUrl != null}">🤖</span>
-                            </div>
-                            <div class="category-icon" th:unless="${card.category != null}">🤖</div>
-                            <span class="category-name" th:text="${card.category.name}">Category</span>
+                <div class="detail-grid">
+                    <!-- 좌상단: 도구 설명 -->
+                    <div class="detail-block block-large">
+                        <div class="block-header">
+                            <span class="block-icon">✏️</span>
+                            <h2>What is this tool?</h2>
                         </div>
-                        <h1 class="card-title" th:text="${card.title}">Card Title</h1>
-                        <div class="card-meta">
-                            <span class="created-date" th:text="${#temporals.format(card.createdAt, 'MMM dd, yyyy')}"
-                                >Created Date</span
-                            >
-                            <div class="like-info">
-                                <span class="like-count" th:text="${card.likesCount + ' likes'}">0 likes</span>
+                        <div class="block-content">
+                            <p th:text="${card.content}">Tool description will be displayed here.</p>
+                            <p th:if="${card.situation != null and card.situation != ''}" th:text="${card.situation}">
+                                Additional explanation about usage situations will be displayed here.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 우상단: 도구 정보 -->
+                    <div class="detail-block block-small">
+                        <div class="block-header">
+                            <span class="block-icon">📋</span>
+                            <h2>Tool Information</h2>
+                        </div>
+                        <div class="block-content">
+                            <div class="info-item">
+                                <label>Category</label>
+                                <div class="info-tag" th:if="${card.category != null}">
+                                    <span th:text="${card.category.name}">Category</span>
+                                </div>
+                            </div>
+                            <div class="info-item" th:if="${card.tags != null and card.tags != ''}">
+                                <label>Tags</label>
+                                <div class="tags-container">
+                                    <span
+                                        th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
+                                        class="info-tag"
+                                        th:text="${'#' + tag.trim()}"
+                                        >#tag</span
+                                    >
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 카드 내용 -->
-                    <div class="card-content">
-                        <!-- 간단한 설명 -->
-                        <div
-                            class="content-section"
-                            th:if="${card.content != null and #strings.length(card.content) > 0}"
-                        >
-                            <h3>Description</h3>
-                            <p th:text="${card.content}">Content description</p>
+                    <!-- 좌하단: 사용 방법 -->
+                    <div class="detail-block block-large">
+                        <div class="block-header">
+                            <span class="block-icon">🚀</span>
+                            <h2>How to Use</h2>
                         </div>
+                        <div class="block-content">
+                            <div
+                                th:if="${card.usageExamples != null and card.usageExamples != ''}"
+                                th:utext="${#strings.replace(card.usageExamples, '\n', '<br>')}"
+                            >
+                                Usage examples will be displayed here.
+                            </div>
+                            <div th:if="${card.usageExamples == null or card.usageExamples == ''}">
+                                <p>Detailed usage instructions are being prepared.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- 태그 -->
-                        <div class="content-section" th:if="${card.tags != null and #strings.length(card.tags) > 0}">
-                            <h3>Related Tags</h3>
-                            <div class="tags">
-                                <span
-                                    th:each="tag : ${#strings.arraySplit(card.tags, ',')}"
-                                    class="tag"
-                                    th:text="${'#' + tag.trim()}"
-                                    >#tag</span
+                    <!-- 우하단: 액션 버튼 -->
+                    <div class="detail-block block-small">
+                        <div class="block-content">
+                            <div class="action-buttons">
+                                <a
+                                    th:data-card-uuid="${card.uuid}"
+                                    th:href="@{/card/{cardId}/edit(cardId=${card.id})}"
+                                    class="btn btn-primary btn-edit"
+                                    style="display: none"
+                                    >Edit Tip</a
                                 >
+                                <button
+                                    class="btn btn-danger btn-delete"
+                                    th:data-card-uuid="${card.uuid}"
+                                    style="display: none"
+                                >
+                                    Delete Tip
+                                </button>
+                                <button
+                                    class="btn btn-secondary btn-like"
+                                    th:data-card-id="${card.id}"
+                                    th:data-uuid="${session.uuid != null ? session.uuid : ''}"
+                                    th:data-liked-uuids="${card.likedUserUuids != null ? #strings.arrayJoin(card.likedUserUuids, ',') : ''}"
+                                >
+                                    <span class="like-icon">❤️</span>
+                                    <span class="like-text">Like</span>
+                                </button>
+                                <button class="btn btn-secondary btn-share" onclick="copyUrl()">
+                                    <span class="share-icon">📤</span>
+                                    Share
+                                </button>
                             </div>
-                        </div>
-
-                        <!-- 사용 상황 -->
-                        <div
-                            class="content-section"
-                            th:if="${card.situation != null and #strings.length(card.situation) > 0}"
-                        >
-                            <h3>When to Use This Tip</h3>
-                            <p th:text="${card.situation}">Usage situation</p>
-                        </div>
-
-                        <!-- 사용 예시 -->
-                        <div
-                            class="content-section"
-                            th:if="${card.usageExamples != null and #strings.length(card.usageExamples) > 0}"
-                        >
-                            <h3>Specific Usage Examples</h3>
-                            <div class="usage-examples">
-                                <pre th:text="${card.usageExamples}">Usage examples</pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 액션 버튼 -->
-                    <div class="card-actions">
-                        <button
-                            class="like-button"
-                            th:data-card-id="${card.id}"
-                            th:data-uuid="${session.uuid != null ? session.uuid : ''}"
-                            th:data-liked-uuids="${card.likedUserUuids != null ? #strings.arrayJoin(card.likedUserUuids, ',') : ''}"
-                        >
-                            <span class="heart-icon">
-                                <span>♡</span>
-                            </span>
-                            <span class="like-text">Like this tip</span>
-                        </button>
-                        <div class="share-section">
-                            <a
-                                th:data-card-uuid="${card.uuid}"
-                                th:href="@{/card/{cardId}/edit(cardId=${card.id})}"
-                                class="btn btn-primary edit-btn"
-                                style="display: none"
-                                >Edit Tip</a
-                            >
                         </div>
                     </div>
                 </div>
