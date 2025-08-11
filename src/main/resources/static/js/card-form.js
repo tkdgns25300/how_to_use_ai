@@ -26,11 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const cardData = {
                 title: formData.get("title"),
                 categoryId: parseInt(formData.get("categoryId")),
-                description: formData.get("description"),
+                content: formData.get("content"),
                 tags: formData.get("tags") || "",
                 situation: formData.get("situation") || "",
                 usageExamples: formData.get("usageExamples") || "",
-                content: formData.get("content") || "",
                 uuid: uuid,
             };
 
@@ -64,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function validateForm() {
         const title = form.querySelector("#title").value.trim();
         const categoryId = form.querySelector("#categoryId").value;
-        const description = form.querySelector("#description").value.trim();
+        const content = form.querySelector("#content").value.trim();
 
         if (!title) {
             showErrorMessage("Please enter a usage tip title.");
@@ -78,9 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
-        if (!description) {
-            showErrorMessage("Please enter a brief description.");
-            form.querySelector("#description").focus();
+        if (!content) {
+            showErrorMessage("Please enter a usage tip description.");
+            form.querySelector("#content").focus();
             return false;
         }
 

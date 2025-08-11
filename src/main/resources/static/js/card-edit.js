@@ -1,130 +1,128 @@
 // 카드 수정 페이지 JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('cardForm');
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("cardForm");
     const submitBtn = form.querySelector('button[type="submit"]');
-    const cardId = document.getElementById('cardId').value;
-    
+    const cardId = document.getElementById("cardId").value;
+
     // UUID 생성 또는 가져오기 (LocalStorage 사용)
-    let uuid = localStorage.getItem('userUuid');
+    let uuid = localStorage.getItem("userUuid");
     if (!uuid) {
         uuid = generateUUID();
-        localStorage.setItem('userUuid', uuid);
+        localStorage.setItem("userUuid", uuid);
     }
-    
+
     // 폼 제출 이벤트 (수정)
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener("submit", async function (e) {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
-        
+
         // 로딩 상태 설정
         setLoadingState(true);
-        
+
         try {
             const formData = new FormData(form);
             const cardData = {
-                title: formData.get('title'),
-                categoryId: parseInt(formData.get('categoryId')),
-                description: formData.get('description'),
-                tags: formData.get('tags') || '',
-                situation: formData.get('situation') || '',
-                usageExamples: formData.get('usageExamples') || '',
-                content: formData.get('content') || '',
-                uuid: uuid
+                title: formData.get("title"),
+                categoryId: parseInt(formData.get("categoryId")),
+                content: formData.get("content"),
+                tags: formData.get("tags") || "",
+                situation: formData.get("situation") || "",
+                usageExamples: formData.get("usageExamples") || "",
+                uuid: uuid,
             };
-            
+
             const response = await fetch(`/api/cards/${cardId}`, {
-                method: 'PUT',
+                method: "PUT",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(cardData)
+                body: JSON.stringify(cardData),
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
-                showSuccessMessage('Tip updated successfully!');
+                showSuccessMessage("Tip updated successfully!");
                 setTimeout(() => {
                     window.location.href = `/card/${cardId}`;
                 }, 2000);
             } else {
-                showErrorMessage(result.message || 'Failed to update tip.');
+                showErrorMessage(result.message || "Failed to update tip.");
             }
-            
         } catch (error) {
-            console.error('Update error:', error);
-            showErrorMessage('Server error occurred. Please try again.');
+            console.error("Update error:", error);
+            showErrorMessage("Server error occurred. Please try again.");
         } finally {
             setLoadingState(false);
         }
     });
-    
+
     // 폼 유효성 검사
     function validateForm() {
-        const title = form.querySelector('#title').value.trim();
-        const categoryId = form.querySelector('#categoryId').value;
-        const description = form.querySelector('#description').value.trim();
-        
+        const title = form.querySelector("#title").value.trim();
+        const categoryId = form.querySelector("#categoryId").value;
+        const content = form.querySelector("#content").value.trim();
+
         if (!title) {
-            showErrorMessage('Please enter a usage tip title.');
-            form.querySelector('#title').focus();
+            showErrorMessage("Please enter a usage tip title.");
+            form.querySelector("#title").focus();
             return false;
         }
-        
+
         if (!categoryId) {
-            showErrorMessage('Please select an AI tool category.');
-            form.querySelector('#categoryId').focus();
+            showErrorMessage("Please select an AI tool category.");
+            form.querySelector("#categoryId").focus();
             return false;
         }
-        
-        if (!description) {
-            showErrorMessage('Please enter a brief description.');
-            form.querySelector('#description').focus();
+
+        if (!content) {
+            showErrorMessage("Please enter a usage tip description.");
+            form.querySelector("#content").focus();
             return false;
         }
-        
+
         return true;
     }
-    
+
     // 로딩 상태 설정
     function setLoadingState(loading) {
         if (loading) {
-            form.classList.add('form-loading');
-            submitBtn.textContent = 'Updating...';
+            form.classList.add("form-loading");
+            submitBtn.textContent = "Updating...";
             submitBtn.disabled = true;
         } else {
-            form.classList.remove('form-loading');
-            submitBtn.textContent = 'Update Tip';
+            form.classList.remove("form-loading");
+            submitBtn.textContent = "Update Tip";
             submitBtn.disabled = false;
         }
     }
-    
+
     // 성공 메시지 표시
     function showSuccessMessage(message) {
-        showMessage(message, 'success');
+        showMessage(message, "success");
     }
-    
+
     // 에러 메시지 표시
     function showErrorMessage(message) {
-        showMessage(message, 'error');
+        showMessage(message, "error");
     }
-    
+
     // 메시지 표시 함수
     function showMessage(message, type) {
         // 기존 메시지 제거
-        const existingMessage = document.querySelector('.message');
+        const existingMessage = document.querySelector(".message");
         if (existingMessage) {
             existingMessage.remove();
         }
-        
+
         // 새 메시지 생성
-        const messageDiv = document.createElement('div');
+        const messageDiv = document.createElement("div");
         messageDiv.className = `message message-${type}`;
         messageDiv.textContent = message;
-        
+
         // 스타일 적용
         messageDiv.style.cssText = `
             position: fixed;
@@ -136,23 +134,23 @@ document.addEventListener('DOMContentLoaded', function() {
             font-weight: 500;
             z-index: 1000;
             animation: slideIn 0.3s ease;
-            ${type === 'success' ? 'background-color: #28a745;' : 'background-color: #dc3545;'}
+            ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
         `;
-        
+
         document.body.appendChild(messageDiv);
-        
+
         // 3초 후 자동 제거
         setTimeout(() => {
-            messageDiv.style.animation = 'slideOut 0.3s ease';
+            messageDiv.style.animation = "slideOut 0.3s ease";
             setTimeout(() => messageDiv.remove(), 300);
         }, 3000);
     }
-    
+
     // UUID 생성 함수
     function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c == "x" ? r : (r & 0x3) | 0x8;
             return v.toString(16);
         });
     }
@@ -160,49 +158,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 카드 삭제 함수
 async function deleteCard() {
-    const cardId = document.getElementById('cardId').value;
-    
-    if (!confirm('Are you sure you want to delete this tip? This action cannot be undone.')) {
+    const cardId = document.getElementById("cardId").value;
+
+    if (!confirm("Are you sure you want to delete this tip? This action cannot be undone.")) {
         return;
     }
-    
+
     try {
         // UUID 가져오기 (LocalStorage 사용)
-        let uuid = localStorage.getItem('userUuid');
+        let uuid = localStorage.getItem("userUuid");
         if (!uuid) {
             uuid = generateUUID();
-            localStorage.setItem('userUuid', uuid);
+            localStorage.setItem("userUuid", uuid);
         }
-        
+
         const response = await fetch(`/api/cards/${cardId}?uuid=${uuid}`, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
-                'Content-Type': 'application/json',
-            }
+                "Content-Type": "application/json",
+            },
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
-            showDeleteMessage('Tip deleted successfully!');
+            showDeleteMessage("Tip deleted successfully!");
             setTimeout(() => {
-                window.location.href = '/';
+                window.location.href = "/";
             }, 2000);
         } else {
-            showDeleteMessage(result.message || 'Failed to delete tip.', 'error');
+            showDeleteMessage(result.message || "Failed to delete tip.", "error");
         }
-        
     } catch (error) {
-        console.error('Delete error:', error);
-        showDeleteMessage('Server error occurred. Please try again.', 'error');
+        console.error("Delete error:", error);
+        showDeleteMessage("Server error occurred. Please try again.", "error");
     }
 }
 
-function showDeleteMessage(message, type = 'success') {
-    const messageDiv = document.createElement('div');
+function showDeleteMessage(message, type = "success") {
+    const messageDiv = document.createElement("div");
     messageDiv.className = `message message-${type}`;
     messageDiv.textContent = message;
-    
+
     messageDiv.style.cssText = `
         position: fixed;
         top: 20px;
@@ -213,19 +210,19 @@ function showDeleteMessage(message, type = 'success') {
         font-weight: 500;
         z-index: 1000;
         animation: slideIn 0.3s ease;
-        ${type === 'success' ? 'background-color: #28a745;' : 'background-color: #dc3545;'}
+        ${type === "success" ? "background-color: #28a745;" : "background-color: #dc3545;"}
     `;
-    
+
     document.body.appendChild(messageDiv);
-    
+
     setTimeout(() => {
-        messageDiv.style.animation = 'slideOut 0.3s ease';
+        messageDiv.style.animation = "slideOut 0.3s ease";
         setTimeout(() => messageDiv.remove(), 300);
     }, 3000);
 }
 
 // 애니메이션 CSS 추가
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = `
     @keyframes slideIn {
         from { transform: translateX(100%); opacity: 0; }
@@ -248,4 +245,4 @@ style.textContent = `
         border-color: #c82333;
     }
 `;
-document.head.appendChild(style); 
+document.head.appendChild(style);

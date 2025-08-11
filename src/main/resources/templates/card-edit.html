@@ -54,12 +54,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="description">Brief Description *</label>
+                            <label for="content">Usage Tip Description *</label>
                             <textarea
-                                id="description"
-                                name="description"
+                                id="content"
+                                name="content"
                                 required
-                                placeholder="Briefly explain how to use this AI tool effectively"
+                                placeholder="Explain how to use this AI tool effectively"
                                 th:text="${card.content}"
                             ></textarea>
                         </div>
@@ -92,16 +92,6 @@
                                 name="usageExamples"
                                 placeholder="Provide step-by-step instructions or specific prompts to use"
                                 th:text="${card.usageExamples}"
-                            ></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="content">Detailed Usage Guide</label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                placeholder="Share detailed tips, best practices, and important notes"
-                                th:text="${card.content}"
                             ></textarea>
                         </div>
 
