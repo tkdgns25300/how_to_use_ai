@@ -791,11 +791,13 @@ body {
     }
 
     /* 모바일에서 블록 순서 조정 */
-    .create-block.block-large {
+    .create-block.block-large,
+    .edit-block.block-large {
         grid-row: 1 !important;
     }
 
-    .create-block.block-small {
+    .create-block.block-small,
+    .edit-block.block-small {
         grid-row: 2 !important;
     }
 
@@ -1092,27 +1094,33 @@ body {
 
 /* 태블릿 환경 최적화 */
 @media (max-width: 1024px) and (min-width: 769px) {
-    .create-grid {
+    .create-grid,
+    .edit-grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
         gap: 25px;
     }
 
     .create-block.block-large,
-    .create-block.block-small {
+    .create-block.block-small,
+    .edit-block.block-large,
+    .edit-block.block-small {
         grid-column: 1;
     }
 
     /* 태블릿에서도 블록 순서 조정 */
-    .create-block.block-large {
+    .create-block.block-large,
+    .edit-block.block-large {
         grid-row: 1;
     }
 
-    .create-block.block-small {
+    .create-block.block-small,
+    .edit-block.block-small {
         grid-row: 2;
     }
 
-    .create-block {
+    .create-block,
+    .edit-block {
         padding: 30px;
     }
 }
@@ -1268,4 +1276,63 @@ body {
     .block-header h2 {
         font-size: 1.1rem;
     }
+}
+
+/* 카드 수정 페이지 블록 레이아웃 */
+.edit-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.edit-block {
+    background: white;
+    border: 3px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+    padding: 25px;
+    transition: all 0.2s ease;
+}
+
+.edit-block:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.edit-block.block-large {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.edit-block.block-small {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* 수정 페이지 헤더 스타일 */
+.edit-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.edit-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.edit-title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
 }
