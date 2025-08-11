@@ -2,7 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <title>Share AI Usage Tip - AI Usage Guide</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
         <link rel="stylesheet" th:href="@{/css/form.css}" />
@@ -12,7 +14,7 @@
         <header class="header">
             <div class="container">
                 <div class="header-content">
-                    <a href="/" class="btn btn-back">←</a>
+                    <a href="/" class="btn btn-back" aria-label="Back to home">←</a>
                     <div class="create-info">
                         <div class="create-icon">✨</div>
                         <h1 class="create-title">Share AI Usage Tip</h1>
@@ -31,7 +33,7 @@
                             <span class="block-icon">📝</span>
                             <h2>Basic Information</h2>
                         </div>
-                        <form id="cardForm" class="card-form">
+                        <form id="cardForm" class="card-form" autocomplete="off" novalidate>
                             <div class="form-group">
                                 <label for="title">Usage Tip Title *</label>
                                 <input
@@ -41,6 +43,9 @@
                                     required
                                     maxlength="20"
                                     placeholder="e.g., Write emails with ChatGPT"
+                                    autocomplete="off"
+                                    inputmode="text"
+                                    spellcheck="false"
                                 />
                             </div>
 
@@ -65,6 +70,9 @@
                                     name="content"
                                     required
                                     placeholder="Explain how to use this AI tool effectively"
+                                    rows="4"
+                                    maxlength="500"
+                                    spellcheck="false"
                                 ></textarea>
                             </div>
 
@@ -75,6 +83,9 @@
                                     id="tags"
                                     name="tags"
                                     placeholder="e.g., email writing, productivity, text generation"
+                                    autocomplete="off"
+                                    inputmode="text"
+                                    spellcheck="false"
                                 />
                             </div>
 
@@ -85,6 +96,9 @@
                                     name="situation"
                                     required
                                     placeholder="Explain when and in what situations this AI tool is most effective"
+                                    rows="3"
+                                    maxlength="300"
+                                    spellcheck="false"
                                 ></textarea>
                             </div>
 
@@ -95,13 +109,20 @@
                                     name="usageExamples"
                                     required
                                     placeholder="Provide step-by-step instructions or specific prompts to use"
+                                    rows="4"
+                                    maxlength="400"
+                                    spellcheck="false"
                                 ></textarea>
                             </div>
 
                             <!-- 폼 액션 버튼을 폼 안으로 이동 -->
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Share Tip</button>
-                                <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span>Share Tip</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                    <span>Cancel</span>
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -119,8 +140,6 @@
                             </p>
                         </div>
                     </div>
-
-                    <!-- 하단 액션 버튼 블록 제거 (폼 안으로 이동됨) -->
                 </div>
             </div>
         </main>
