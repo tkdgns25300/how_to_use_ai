@@ -11,74 +11,59 @@ import sanghun.project.howtouseai.exception.LikeAlreadyExistsException;
 import sanghun.project.howtouseai.exception.LikeNotFoundException;
 import sanghun.project.howtouseai.repository.CardLikeRepository;
 import sanghun.project.howtouseai.repository.CardRepository;
+import sanghun.project.howtouseai.dto.LikeResponse;
 
 import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class CardLikeService {
 
     private final CardLikeRepository cardLikeRepository;
     private final CardRepository cardRepository;
 
-    @Transactional
-    public void addLike(Long cardId, String uuid) {
-        log.info("좋아요 추가 요청: cardId={}, uuid={}", cardId, uuid);
+    /**
+     * 특정 카드에 대한 사용자의 '좋아요' 상태를 토글합니다.
+     * 이미 '좋아요'를 눌렀다면 취소하고, 누르지 않았다면 추가합니다.
+     *
+     * @param cardId 카드 ID
+     * @param uuid   사용자 UUID
+     * @return 새로운 좋아요 상태와 총 좋아요 수를 담은 응답 DTO
+     * @throws CardNotFoundException 해당 ID의 카드가 존재하지 않을 경우
+     */
+    public LikeResponse toggleLike(Long cardId, String uuid) {
+        log.info("좋아요 토글 요청: cardId={}, uuid={}", cardId, uuid);
 
-        // 카드 존재 여부 확인
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> {
-                    log.warn("존재하지 않는 카드에 좋아요 시도: cardId={}", cardId);
-                    return new CardNotFoundException(
-                        String.format("카드를 찾을 수 없습니다: ID %d", cardId)
-                    );
+                    log.warn("존재하지 않는 카드에 좋아요 토글 시도: cardId={}", cardId);
+                    return new CardNotFoundException("Card not found with id: " + cardId);
                 });
 
-        // 이미 좋아요했는지 확인
-        if (cardLikeRepository.existsByCardIdAndUuid(cardId, uuid)) {
-            log.warn("이미 좋아요한 카드에 중복 좋아요 시도: cardId={}, uuid={}", cardId, uuid);
-            throw new LikeAlreadyExistsException(
-                String.format("이미 좋아요한 카드입니다: ID %d", cardId)
-            );
-        }
-
-        // 좋아요 엔티티 생성
-        CardLike cardLike = CardLike.builder()
-                .card(card)
-                .uuid(uuid)
-                .build();
-
-        // 저장
-        cardLikeRepository.save(cardLike);
-        log.info("좋아요 추가 완료: cardId={}, uuid={}", cardId, uuid);
-    }
-
-    @Transactional
-    public void removeLike(Long cardId, String uuid) {
-        log.info("좋아요 취소 요청: cardId={}, uuid={}", cardId, uuid);
-
-        // 카드 존재 여부 확인
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> {
-                    log.warn("존재하지 않는 카드에 좋아요 취소 시도: cardId={}", cardId);
-                    return new CardNotFoundException(
-                        String.format("카드를 찾을 수 없습니다: ID %d", cardId)
-                    );
-                });
-
-        // 좋아요 존재 여부 확인
         Optional<CardLike> existingLike = cardLikeRepository.findByCardIdAndUuid(cardId, uuid);
-        if (existingLike.isEmpty()) {
-            log.warn("존재하지 않는 좋아요 취소 시도: cardId={}, uuid={}", cardId, uuid);
-            throw new LikeNotFoundException(
-                String.format("좋아요를 찾을 수 없습니다: 카드 ID %d, UUID %s", cardId, uuid)
-            );
+
+        boolean isLiked;
+        if (existingLike.isPresent()) {
+            // 이미 좋아요 상태 -> 좋아요 취소
+            cardLikeRepository.delete(existingLike.get());
+            isLiked = false;
+            log.info("좋아요 취소 완료: cardId={}, uuid={}", cardId, uuid);
+        } else {
+            // 좋아요 아닌 상태 -> 좋아요 추가
+            CardLike newLike = CardLike.builder().card(card).uuid(uuid).build();
+            cardLikeRepository.save(newLike);
+            isLiked = true;
+            log.info("좋아요 추가 완료: cardId={}, uuid={}", cardId, uuid);
         }
 
-        // 좋아요 삭제
-        cardLikeRepository.delete(existingLike.get());
-        log.info("좋아요 취소 완료: cardId={}, uuid={}", cardId, uuid);
+        long likesCount = cardLikeRepository.countByCardId(cardId);
+        log.info("좋아요 토글 후, 카드 ID {}의 총 좋아요 수: {}", cardId, likesCount);
+
+        return LikeResponse.builder()
+                .liked(isLiked)
+                .likesCount(likesCount)
+                .build();
     }
 } 

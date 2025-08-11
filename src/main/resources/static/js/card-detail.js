@@ -20,17 +20,18 @@ function initializeLikeButtons() {
             }
         }
 
-        button.addEventListener("click", () => handleLikeClick(button, cardId));
+        button.addEventListener("click", handleLikeClick);
     });
 }
 
-// 좋아요 클릭 처리
-async function handleLikeClick(button, cardId) {
-    const uuid = getUuid();
-    if (!uuid) {
-        alert("Please refresh the page to like this tip.");
-        return;
-    }
+// 좋아요 버튼 클릭 처리
+async function handleLikeClick(e) {
+    const likeButton = e.currentTarget;
+    const cardId = likeButton.getAttribute("data-card-id");
+    const likeCountSpan = document.getElementById(`like-count-${cardId}`);
+
+    // 로딩 상태 (애니메이션 등)
+    likeButton.disabled = true;
 
     try {
         const response = await fetch(`/api/cards/${cardId}/like`, {
@@ -38,39 +39,49 @@ async function handleLikeClick(button, cardId) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ uuid: uuid }),
+            body: JSON.stringify({ uuid: getUuid() }),
         });
 
-        if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                toggleLikeState(button);
-                updateLikeCount(button, result.data.liked);
-            }
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            const likeData = result.data;
+            // UI 업데이트
+            toggleLikeState(likeButton, likeData.liked);
+            updateLikeCount(likeCountSpan, likeData.likesCount);
+
+            notification.info(
+                likeData.liked ? "Liked!" : "Unliked",
+                likeData.liked ? "You now like this tip." : "You no longer like this tip.",
+                2000
+            );
         } else {
-            console.error("Failed to like/unlike");
+            notification.error("Error", result.message || "Failed to update like status.", 4000);
         }
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Like Error:", error);
+        notification.error("Network Error", "Could not connect to the server.", 4000);
+    } finally {
+        likeButton.disabled = false;
     }
 }
 
-// 좋아요 상태 토글
-function toggleLikeState(button) {
-    const isLiked = button.classList.contains("liked");
+// 좋아요 버튼 상태 변경
+function toggleLikeState(button, isLiked) {
     if (isLiked) {
-        button.classList.remove("liked");
-        button.querySelector(".like-text").textContent = "Like";
-    } else {
         button.classList.add("liked");
-        button.querySelector(".like-text").textContent = "Liked";
+        button.innerHTML = "<span>❤️ Liked</span>";
+    } else {
+        button.classList.remove("liked");
+        button.innerHTML = "<span>🤍 Like</span>";
     }
 }
 
 // 좋아요 수 업데이트
-function updateLikeCount(button, liked) {
-    // 좋아요 수는 서버에서 업데이트되므로 페이지 새로고침이 필요할 수 있습니다
-    // 실제 구현에서는 서버 응답에서 좋아요 수를 받아와서 업데이트
+function updateLikeCount(span, count) {
+    if (span) {
+        span.textContent = count;
+    }
 }
 
 // 수정/삭제 버튼 초기화
