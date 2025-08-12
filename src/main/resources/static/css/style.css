@@ -561,6 +561,23 @@ body {
     text-decoration: none;
 }
 
+.btn-back-white {
+    background-color: white;
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--border-color);
+}
+
+.btn-back-white:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--border-color);
+}
+
+.btn-back-white:active {
+    transform: translate(var(--shadow-offset), var(--shadow-offset));
+    box-shadow: 0 0 0 var(--border-color);
+}
+
 .tool-info,
 .edit-info {
     display: flex;

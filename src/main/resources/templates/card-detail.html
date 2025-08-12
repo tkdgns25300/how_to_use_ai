@@ -12,11 +12,8 @@
         <header class="header">
             <div class="container">
                 <div class="header-content">
-                    <a href="/" class="btn btn-back">←</a>
+                    <a href="/" class="btn btn-back btn-back-white">←</a>
                     <div class="tool-info">
-                        <div class="category-badge" th:if="${card.category != null}">
-                            <span th:text="${card.category.name}">Category</span>
-                        </div>
                         <div class="tool-icon">✏️</div>
                         <h1 class="tool-title" th:text="${card.title}">Tool Title</h1>
                     </div>
@@ -49,12 +46,6 @@
                             <h2>Tip Details</h2>
                         </div>
                         <div class="block-content">
-                            <div class="info-item">
-                                <label>Category</label>
-                                <div class="info-tag" th:if="${card.category != null}">
-                                    <span th:text="${card.category.name}">Category</span>
-                                </div>
-                            </div>
                             <div class="info-item" th:if="${card.tags != null and card.tags != ''}">
                                 <label>Tags</label>
                                 <div class="tags-container">
