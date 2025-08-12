@@ -78,7 +78,8 @@
                         <div class="block-content">
                             <div
                                 th:if="${card.usageExamples != null and card.usageExamples != ''}"
-                                th:utext="${#strings.replace(card.usageExamples, '\n', '<br>')}"
+                                class="usage-examples"
+                                th:utext="${#strings.replace(#strings.replace(card.usageExamples, '\r\n', '<br>'), '\n', '<br>')}"
                             >
                                 Usage examples will be displayed here.
                             </div>

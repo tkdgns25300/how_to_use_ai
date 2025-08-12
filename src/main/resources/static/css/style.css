@@ -237,7 +237,7 @@ body {
 }
 
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
 }
 
@@ -465,6 +465,16 @@ body {
 }
 
 /* 카드 상세 페이지 스타일 */
+.usage-examples {
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+.usage-examples br {
+    display: block;
+    margin-bottom: 0.5em;
+}
+
 .detail-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -1430,5 +1440,12 @@ body {
         min-width: auto;
         max-width: none;
         width: 100%;
+    }
+}
+
+/* Mobile responsive for card titles */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 0.9rem;
     }
 }
