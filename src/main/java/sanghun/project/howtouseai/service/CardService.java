@@ -52,7 +52,7 @@ public class CardService {
     }
 
     /**
-     * 홈 페이지에 표시할 카드 목록을 조회합니다. (좋아요 정보 포함)
+     * 홈 페이지에 표시할 카드 목록을 조회합니다. (좋아요 정보 포함, 좋아요 순 → 생성일 최신순 정렬)
      *
      * @param pageable 페이징 정보
      * @param userUuid 현재 사용자 UUID
@@ -63,7 +63,8 @@ public class CardService {
         log.info("홈 페이지 카드 조회 요청: page={}, size={}, userUuid={}", 
                 pageable.getPageNumber(), pageable.getPageSize(), userUuid);
         
-        Page<Card> cards = cardRepository.findAllWithCategory(pageable);
+        // 좋아요 순 → 생성일 최신순으로 정렬된 카드 조회 (JOIN 기반으로 더 효율적)
+        Page<Card> cards = cardRepository.findAllWithCategoryOrderedByLikesAndDate(pageable);
         log.info("홈 페이지 카드 조회 완료: totalElements={}, totalPages={}", 
                 cards.getTotalElements(), cards.getTotalPages());
 
