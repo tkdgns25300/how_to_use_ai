@@ -81,7 +81,6 @@
                                     placeholder="Explain how to use this AI tool effectively"
                                     th:text="${card.content}"
                                     rows="4"
-                                    maxlength="500"
                                     spellcheck="false"
                                 ></textarea>
                             </div>
@@ -93,10 +92,11 @@
                                     id="tags"
                                     name="tags"
                                     th:value="${card.tags}"
-                                    placeholder="e.g., email writing, productivity, text generation"
+                                    placeholder="e.g., email writing, productivity, text generation (max 3 tags)"
                                     autocomplete="off"
                                     inputmode="text"
                                     spellcheck="false"
+                                    maxlength="100"
                                 />
                             </div>
 
@@ -109,7 +109,6 @@
                                     placeholder="Explain when and in what situations this AI tool is most effective"
                                     th:text="${card.situation}"
                                     rows="3"
-                                    maxlength="300"
                                     spellcheck="false"
                                 ></textarea>
                             </div>
@@ -123,7 +122,6 @@
                                     placeholder="Provide step-by-step instructions or specific prompts to use"
                                     th:text="${card.usageExamples}"
                                     rows="4"
-                                    maxlength="400"
                                     spellcheck="false"
                                 ></textarea>
                             </div>
