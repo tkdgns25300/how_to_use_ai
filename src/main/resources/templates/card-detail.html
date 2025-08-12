@@ -110,12 +110,21 @@
                                 </button>
                                 <button
                                     class="btn btn-secondary btn-like"
+                                    th:classappend="${card.likedByUser ? 'liked' : ''}"
                                     th:data-card-id="${card.id}"
                                     th:data-uuid="${session.uuid != null ? session.uuid : ''}"
                                     th:data-liked-uuids="${card.likedUserUuids != null ? #strings.arrayJoin(card.likedUserUuids, ',') : ''}"
+                                    th:data-liked-by-user="${card.likedByUser}"
+                                    onclick="handleLikeClickWithUuid(event)"
+                                    th:data-current-uuid="${session.uuid != null ? session.uuid : ''}"
                                 >
-                                    <span class="like-icon">❤️</span>
-                                    <span class="like-text">Like</span>
+                                    <span
+                                        class="like-icon"
+                                        th:class="${card.likedByUser ? 'heart-icon liked' : 'heart-icon'}"
+                                        >❤️</span
+                                    >
+                                    <span class="like-text" th:text="${card.likedByUser ? 'Liked' : 'Like'}">Like</span>
+                                    <span class="like-count" th:text="${card.likesCount}">0</span>
                                 </button>
                                 <button class="btn btn-secondary btn-share" onclick="copyUrl()">
                                     <span class="share-icon">📤</span>

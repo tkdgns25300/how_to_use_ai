@@ -34,7 +34,7 @@ public class CardLikeService {
      * @return 새로운 좋아요 상태와 총 좋아요 수를 담은 응답 DTO
      * @throws CardNotFoundException 해당 ID의 카드가 존재하지 않을 경우
      */
-    public LikeResponse toggleLike(Long cardId, String uuid) {
+    public synchronized LikeResponse toggleLike(Long cardId, String uuid) {
         log.info("좋아요 토글 요청: cardId={}, uuid={}", cardId, uuid);
 
         if (!cardRepository.existsById(cardId)) {

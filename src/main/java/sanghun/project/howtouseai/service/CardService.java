@@ -103,8 +103,8 @@ public class CardService {
         boolean isLiked = likes.stream().anyMatch(like -> like.getUuid().equals(userUuid));
         List<String> likedUuids = likes.stream().map(CardLike::getUuid).collect(Collectors.toList());
         
-        log.info("카드 상세 조회 완료: id={}, title={}, likesCount={}", 
-                card.getId(), card.getTitle(), likesCount);
+        log.info("카드 상세 조회 완료: id={}, title={}, likesCount={}, isLiked={}, userUuid={}, likedUuids={}", 
+                card.getId(), card.getTitle(), likesCount, isLiked, userUuid, likedUuids);
         
         return convertToResponse(card, likesCount, isLiked, likedUuids);
     }

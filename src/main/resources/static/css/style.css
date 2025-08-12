@@ -707,6 +707,17 @@ body {
     color: white !important;
 }
 
+.btn-like .like-count {
+    margin-left: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.btn-like.liked .like-count {
+    color: white;
+}
+
 /* 삭제 버튼 스타일 */
 .btn-delete {
     background-color: #dc3545;

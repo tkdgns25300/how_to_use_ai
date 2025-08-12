@@ -1,5 +1,12 @@
 // 카드 상세 페이지 JavaScript
 document.addEventListener("DOMContentLoaded", function () {
+    // UUID가 없으면 생성
+    if (!localStorage.getItem("userUuid")) {
+        const newUuid = "uuid-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem("userUuid", newUuid);
+        console.log("New UUID created:", newUuid);
+    }
+
     initializeLikeButtons();
     initializeEditDeleteButtons();
 });
@@ -9,29 +16,89 @@ function initializeLikeButtons() {
     const likeButtons = document.querySelectorAll(".btn-like");
     likeButtons.forEach((button) => {
         const cardId = button.getAttribute("data-card-id");
-        const uuid = button.getAttribute("data-uuid");
+        const currentUuid = getUuid(); // 현재 사용자의 UUID
         const likedUuids = button.getAttribute("data-liked-uuids");
 
-        if (uuid && likedUuids) {
+        // 현재 사용자가 이 카드를 좋아요했는지 확인
+        let isLikedByCurrentUser = false;
+        if (likedUuids) {
             const uuidList = likedUuids.split(",").filter((u) => u.trim() !== "");
-            if (uuidList.includes(uuid)) {
-                button.classList.add("liked");
-                button.querySelector(".like-text").textContent = "Liked";
-            }
+            isLikedByCurrentUser = uuidList.includes(currentUuid);
+            console.log(
+                `Card ${cardId} - Current user UUID: ${currentUuid}, Liked UUIDs: ${uuidList}, Is liked by current user: ${isLikedByCurrentUser}`
+            );
         }
 
-        button.addEventListener("click", handleLikeClick);
+        // 좋아요 상태 설정
+        if (isLikedByCurrentUser) {
+            button.classList.add("liked");
+            const likeText = button.querySelector(".like-text");
+            const likeIcon = button.querySelector(".like-icon");
+            if (likeText) likeText.textContent = "Liked";
+            if (likeIcon) likeIcon.textContent = "❤️";
+            console.log(`Button set to liked state for card ${cardId}`);
+        } else {
+            button.classList.remove("liked");
+            const likeText = button.querySelector(".like-text");
+            const likeIcon = button.querySelector(".like-icon");
+            if (likeText) likeText.textContent = "Like";
+            if (likeIcon) likeIcon.textContent = "🤍";
+            console.log(`Button set to unliked state for card ${cardId}`);
+        }
+
+        // 디버깅을 위한 로그 추가
+        console.log(`Card ${cardId} like state:`, {
+            buttonClasses: button.className,
+            isLiked: button.classList.contains("liked"),
+            currentUserUuid: currentUuid,
+            likedUuids: likedUuids,
+            isLikedByCurrentUser: isLikedByCurrentUser,
+        });
+
+        button.addEventListener("click", handleLikeClickWithUuid);
     });
+}
+
+// UUID를 URL에 추가하는 함수 (현재는 사용하지 않음)
+function addUuidToUrl() {
+    // URL 변경으로 인한 문제를 방지하기 위해 임시로 비활성화
+    console.log("UUID URL 추가 기능은 현재 비활성화됨");
+}
+
+// 좋아요 버튼 클릭 처리 (UUID URL 추가 포함)
+async function handleLikeClickWithUuid(e) {
+    const button = e.currentTarget;
+
+    // 이미 처리 중인 경우 중복 클릭 방지
+    if (button.disabled) {
+        console.log("Like request already in progress, ignoring click");
+        return;
+    }
+
+    // 버튼 비활성화 (중복 클릭 방지)
+    button.disabled = true;
+    button.style.opacity = "0.6";
+
+    try {
+        // UUID를 URL에 추가
+        addUuidToUrl();
+
+        // 기존 좋아요 처리 로직 호출
+        await handleLikeClick(e);
+    } finally {
+        // 요청 완료 후 버튼 활성화
+        button.disabled = false;
+        button.style.opacity = "1";
+    }
 }
 
 // 좋아요 버튼 클릭 처리
 async function handleLikeClick(e) {
     const likeButton = e.currentTarget;
     const cardId = likeButton.getAttribute("data-card-id");
-    const likeCountSpan = document.getElementById(`like-count-${cardId}`);
+    const likeCountSpan = likeButton.querySelector(".like-count");
 
-    // 로딩 상태 (애니메이션 등)
-    likeButton.disabled = true;
+    // 로딩 상태는 이미 handleLikeClickWithUuid에서 처리됨
 
     try {
         const response = await fetch(`/api/cards/${cardId}/like`, {
@@ -61,8 +128,6 @@ async function handleLikeClick(e) {
     } catch (error) {
         console.error("Like Error:", error);
         notification.error("Network Error", "Could not connect to the server.", 4000);
-    } finally {
-        likeButton.disabled = false;
     }
 }
 
@@ -70,10 +135,16 @@ async function handleLikeClick(e) {
 function toggleLikeState(button, isLiked) {
     if (isLiked) {
         button.classList.add("liked");
-        button.innerHTML = "<span>❤️ Liked</span>";
+        const likeText = button.querySelector(".like-text");
+        const likeIcon = button.querySelector(".like-icon");
+        if (likeText) likeText.textContent = "Liked";
+        if (likeIcon) likeIcon.textContent = "❤️";
     } else {
         button.classList.remove("liked");
-        button.innerHTML = "<span>🤍 Like</span>";
+        const likeText = button.querySelector(".like-text");
+        const likeIcon = button.querySelector(".like-icon");
+        if (likeText) likeText.textContent = "Like";
+        if (likeIcon) likeIcon.textContent = "🤍";
     }
 }
 
@@ -170,6 +241,7 @@ async function deleteCard(cardId) {
 
 // UUID 가져오기
 function getUuid() {
+    // localStorage에서 UUID 확인 (우선순위 1)
     let uuid = localStorage.getItem("userUuid");
     if (!uuid) {
         uuid = "uuid-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);

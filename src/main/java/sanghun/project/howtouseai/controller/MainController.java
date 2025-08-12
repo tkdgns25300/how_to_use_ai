@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import sanghun.project.howtouseai.service.CardService;
 import sanghun.project.howtouseai.service.CategoryService;
 
@@ -63,16 +64,26 @@ public class MainController {
     }
 
     @GetMapping("/card/{cardId}")
-    public String cardDetail(@PathVariable Long cardId, Model model, HttpSession session) {
-        log.info("Card detail page accessed: cardId={}", cardId);
+    public String cardDetail(@PathVariable Long cardId, @RequestParam(name = "uuid", required = false) String clientUuid, Model model, HttpSession session) {
+        log.info("Card detail page accessed: cardId={}, clientUuid={}", cardId, clientUuid);
         
-        String userUuid = getOrCreateUserUuid(session);
+        String userUuid;
+        if (clientUuid != null) {
+            userUuid = clientUuid;
+            log.info("Using client UUID: {}", userUuid);
+        } else {
+            userUuid = getOrCreateUserUuid(session);
+            log.info("Using session UUID (client UUID not provided): {}", userUuid);
+        }
+        
+        log.info("Final user UUID for card detail: {}", userUuid);
 
         try {
             var cardResponse = cardService.getCardById(cardId, userUuid);
             model.addAttribute("card", cardResponse);
             
-            log.info("Card detail loaded: id={}, title={}", cardResponse.getId(), cardResponse.getTitle());
+            log.info("Card detail loaded: id={}, title={}, likedByUser={}", 
+                    cardResponse.getId(), cardResponse.getTitle(), cardResponse.isLikedByUser());
             
         } catch (Exception e) {
             log.error("Error loading card detail: {}", e.getMessage(), e);
