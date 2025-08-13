@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title th:text="${card.title} + ' - AI Usage Guide'">AI Usage Guide</title>
         <link rel="stylesheet" th:href="@{/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/css/form.css}" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         <link rel="stylesheet" th:href="@{/css/detail.css}" />
     </head>
     <body>
@@ -127,6 +129,49 @@
                 </div>
             </div>
         </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <a href="mailto:tkdgns25300@gmail.com" class="footer-link">
+                            <i class="footer-icon fas fa-envelope"></i>
+                            <span class="footer-link-text">Email</span>
+                        </a>
+                    </div>
+
+                    <div class="footer-section">
+                        <a
+                            href="https://github.com/tkdgns25300"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="footer-link"
+                        >
+                            <i class="footer-icon fab fa-github"></i>
+                            <span class="footer-link-text">GitHub</span>
+                        </a>
+                    </div>
+
+                    <div class="footer-section">
+                        <a
+                            href="https://www.linkedin.com/in/%EC%83%81%ED%9B%88-%EC%9D%B4-677669210/?locale=en_US"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="footer-link"
+                        >
+                            <i class="footer-icon fab fa-linkedin"></i>
+                            <span class="footer-link-text">LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p class="copyright">© 2025 AI Usage Guide. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
         <script th:src="@{/js/notification.js}"></script>
         <script th:src="@{/js/card-detail.js}"></script>
     </body>
