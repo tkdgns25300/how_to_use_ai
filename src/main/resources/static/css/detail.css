@@ -202,12 +202,29 @@
 @media (max-width: 768px) {
     .detail-grid {
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
         gap: 20px;
     }
 
-    .block-large,
-    .block-small {
+    /* 모바일에서 모든 컴포넌트를 세로로 배치 */
+    .detail-block:nth-child(1) {
         grid-column: 1;
+        grid-row: 1;
+    }
+
+    .detail-block:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .detail-block:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .detail-block:nth-child(4) {
+        grid-column: 1;
+        grid-row: 4;
     }
 
     .header-content {
