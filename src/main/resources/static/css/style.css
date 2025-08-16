@@ -1547,7 +1547,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* Mobile responsive for footer */
+/* Mobile responsive for footer - always horizontal */
 @media (max-width: 768px) {
     .footer {
         margin-top: 68px;
@@ -1555,21 +1555,26 @@ body {
     }
 
     .footer-content {
-        flex-direction: column;
-        gap: 51px;
+        flex-direction: row;
+        gap: 30px;
+        margin-bottom: 51px;
     }
 
     .footer-section {
-        gap: 17px;
+        gap: 15px;
     }
 
     .footer-link {
-        padding: 18px;
-        width: 70px;
-        height: 70px;
+        padding: 15px;
+        width: 60px;
+        height: 60px;
     }
 
     .footer-icon {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+
+    .footer-link-text {
+        font-size: 0.7rem;
     }
 }
